@@ -32,7 +32,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     fd.append('ciudad', form.ciudad);
     fd.append('puesto', form.puesto);
     // Si tienes más campos de Paso 1, añádelos aquí:
-    // fd.append('campoPaso1', form.campoPaso1);
+    // fd.append('otroCampo', form.otroCampo);
 
     try {
       const res = await fetch('/api/estudios', {
@@ -40,8 +40,10 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         body: fd,
       });
       if (!res.ok) {
-        const err = await res.json();
-        console.error('Error al subir estudio:', err);
+        let errorData;
+        try { errorData = await res.json(); }
+        catch { errorData = await res.text(); }
+        console.error('Error al subir estudio:', errorData);
         return;
       }
       const data = await res.json();
@@ -52,7 +54,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     }
   };
 
-  // Habilita “Siguiente” solo si todo está lleno
+  // Habilita “Siguiente” solo si todo está completo
   const canNext =
     form.cv &&
     form.nombreCandidato?.trim().length > 0 &&
@@ -73,7 +75,9 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
           onChange={handleFile}
         />
         {touched.cv && !form.cv && (
-          <div className="invalid-feedback">Debes seleccionar un archivo (.pdf, .doc, .docx)</div>
+          <div className="invalid-feedback">
+            Debes seleccionar un archivo (.pdf, .doc, .docx)
+          </div>
         )}
       </div>
 
@@ -83,4 +87,64 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         <input
           type="text"
           className={`form-control ${
-            touched.nombreCandidato && !form.nombreCandidato?
+            touched.nombreCandidato && !form.nombreCandidato?.trim() ? 'is-invalid' : ''
+          }`}
+          value={form.nombreCandidato || ''}
+          onChange={handleChange('nombreCandidato')}
+          onBlur={handleBlur('nombreCandidato')}
+        />
+        {touched.nombreCandidato && !form.nombreCandidato?.trim() && (
+          <div className="invalid-feedback">Este campo es obligatorio</div>
+        )}
+      </div>
+
+      {/* Ciudad y Puesto */}
+      <div className="row g-3 mt-3">
+        <div className="col-md-6">
+          <label className="form-label">Ciudad del candidato</label>
+          <input
+            type="text"
+            className={`form-control ${
+              touched.ciudad && !form.ciudad?.trim() ? 'is-invalid' : ''
+            }`}
+            value={form.ciudad || ''}
+            onChange={handleChange('ciudad')}
+            onBlur={handleBlur('ciudad')}
+          />
+          {touched.ciudad && !form.ciudad?.trim() && (
+            <div className="invalid-feedback">Este campo es obligatorio</div>
+          )}
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Puesto solicitado</label>
+          <input
+            type="text"
+            className={`form-control ${
+              touched.puesto && !form.puesto?.trim() ? 'is-invalid' : ''
+            }`}
+            value={form.puesto || ''}
+            onChange={handleChange('puesto')}
+            onBlur={handleBlur('puesto')}
+          />
+          {touched.puesto && !form.puesto?.trim() && (
+            <div className="invalid-feedback">Este campo es obligatorio</div>
+          )}
+        </div>
+      </div>
+
+      {/* Botones */}
+      <div className="d-flex justify-content-between mt-4">
+        <button className="btn btn-outline-secondary" onClick={onBack}>
+          Atrás
+        </button>
+        <button
+          className="btn btn-primary"
+          onClick={handleSubmitPaso2}
+          disabled={!canNext}
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  );
+}
