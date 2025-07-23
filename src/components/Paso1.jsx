@@ -36,8 +36,7 @@ export default function Paso1({ form, setForm, onNext }) {
 
   return (
     <div className="container py-5">
-      <h4 className="mb-4 fw-bold">Paso 1: Tus datos</h4>
-      <p>Introduce tus datos personales para empezar tu pedido de estudio socioeconómico</p>
+      <h4 className="mb-4 fw-bold">Paso 1: Introduce tus datos personales para empezar tu pedido de estudio socioeconómico</h4>
       <div className="row g-3">
         {[
           { key: 'nombre', label: 'Nombre' },
