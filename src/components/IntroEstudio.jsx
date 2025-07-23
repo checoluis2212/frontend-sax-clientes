@@ -11,8 +11,8 @@ export default function IntroEstudio({ onStart }) {
             Solicita tu primer estudio<br/>socioeconómico
           </h1>
           <p className="mt-4">
-            <strong>Compra de prueba en línea:</strong><br/>
-            Estándar <strong>500 MXN</strong> | Urgente <strong>800 MXN</strong>
+            <strong>Compra tu primer estudio en línea:<br/></strong>
+            Estándar <strong>$500 MXN</strong> | Urgente <strong>$800 MXN</strong>
           </p>
           <button
             className="btn btn-primary btn-lg mt-3"
