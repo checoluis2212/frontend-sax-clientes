@@ -31,7 +31,7 @@ export default function PedirEstudio() {
         <div className="container d-flex justify-content-between align-items-center">
           {/* Logo SAX */}
           <img
-            src="/assets/sax.png"
+            src="/sax.png"
             alt="SAX Servicios Empresariales"
             height="100"
             width="100"
