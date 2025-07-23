@@ -52,13 +52,13 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         body: fd,
       });
 
-      if (!res.ok) {
-        let errorData;
-        try { errorData = await res.json(); }
-        catch { errorData = await res.text(); }
-        console.error('Error al subir estudio:', errorData);
-        return;
-      }
+// dentro de handleSubmitPaso2, después de recibir la respuesta…
+  if (res.ok) {
+  const { docId, cvUrl } = await res.json();
+  setForm(f => ({ ...f, docId, cvUrl }));
+  onNext();  // ahora tienes docId en form
+}
+
 
       const data = await res.json();
       console.log('Estudio guardado:', data);
