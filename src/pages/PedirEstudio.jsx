@@ -33,8 +33,8 @@ export default function PedirEstudio() {
           <img
             src="sax.png"
             alt="SAX Servicios Empresariales"
-            height="150"
-            width="150"
+            height="120"
+            width="120"
           />
           {/* Título fijo */}
           <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
