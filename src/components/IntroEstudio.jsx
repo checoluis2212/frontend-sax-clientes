@@ -8,11 +8,10 @@ export default function IntroEstudio({ onStart }) {
         {/* IZQUIERDA */}
         <div className="col-md-6 mb-4">
           <h1 className="display-4 fw-bold">
-            Solicita tu primer estudio<br/>socioeconómico
+            Solicita un estudio<br/>socioeconómico al instante
           </h1>
           <p className="mt-4">
-            <strong>Compra tu primer estudio en línea:<br/></strong>
-            Estándar <strong>$500 MXN</strong> | Urgente <strong>$800 MXN</strong>
+            <strong>Estándar $500 MXN</strong> |<strong>Urgente $800 MXN</strong>
           </p>
           <button
             className="btn btn-primary btn-lg mt-3"
