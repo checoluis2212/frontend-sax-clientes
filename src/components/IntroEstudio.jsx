@@ -36,7 +36,7 @@ export default function IntroEstudio({ onStart }) {
               <h5 className="mb-1">Paso 3: Pago</h5>
               <small>Elige Estándar (500 MXN) o Urgente (800 MXN) y finaliza.</small>
             </li>
-          </ol>
+          </ul>
         </div>
       </div>
 
