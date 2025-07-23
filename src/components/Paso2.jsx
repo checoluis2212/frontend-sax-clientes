@@ -5,6 +5,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     cv: false,
     ciudad: false,
     puesto: false,
+    nombreCandidato: false,
   })
 
   const handleFile = (e) => {
@@ -22,9 +23,10 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
   }
 
   const canNext =
-    form.cv &&
-    form.ciudad?.trim() &&
-    form.puesto?.trim()
+  form.cv &&
+  form.nombreCandidato?.trim() && // 
+  form.ciudad?.trim() &&
+  form.puesto?.trim()
 
   return (
     <div className="container py-5">
@@ -41,6 +43,18 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         {touched.cv && !form.cv && (
           <div className="invalid-feedback">Debes seleccionar un archivo</div>
         )}
+      </div>
+
+      <div className="mb-3">
+       <label className="form-label">Nombre completo del candidato</label>
+       <input
+         type="text"
+         className="form-control"
+         value={form.nombreCandidato || ''}
+         onChange={(e) => setForm({ ...form, nombreCandidato: e.target.value })}
+         onBlur={() => setTouched({ ...touched, nombreCandidato: true })}
+         required
+      />
       </div>
 
       <div className="row g-3 mt-3">
