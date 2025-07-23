@@ -1,4 +1,4 @@
-const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const BACKEND = import.meta.env.VITE_API_URL || 'https://api.saxmexico.com'
 
 export async function crearCheckout(datos) {
   const resp = await fetch(`${BACKEND}/api/checkout`, {
