@@ -1,4 +1,3 @@
-// src/components/Paso2.jsx
 import React, { useState } from 'react';
 
 export default function Paso2({ form, setForm, onBack, onNext }) {
@@ -9,7 +8,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     puesto: false,
   });
 
-  // Genéricos para inputs de texto
+  // Handlers para inputs de texto
   const handleChange = (field) => (e) => {
     setForm((f) => ({ ...f, [field]: e.target.value }));
   };
@@ -17,28 +16,42 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     setTouched((t) => ({ ...t, [field]: true }));
   };
 
-  // Manejo de archivo
+  // Handler para el archivo CV
   const handleFile = (e) => {
     const file = e.target.files[0] || null;
     setTouched((t) => ({ ...t, cv: true }));
     setForm((f) => ({ ...f, cv: file }));
   };
 
-  // Envío con FormData
+  // Determina la URL base según entorno
+  const API_BASE =
+    process.env.NODE_ENV === 'production'
+      ? 'https://api.clientes.saxmexico.com'
+      : '';
+
+  // Comprueba si puede avanzar
+  const canNext =
+    form.cv &&
+    form.nombreCandidato?.trim().length > 0 &&
+    form.ciudad?.trim().length > 0 &&
+    form.puesto?.trim().length > 0;
+
+  // Envía el formulario con FormData
   const handleSubmitPaso2 = async () => {
     const fd = new FormData();
     fd.append('cv', form.cv);
     fd.append('nombreCandidato', form.nombreCandidato);
     fd.append('ciudad', form.ciudad);
     fd.append('puesto', form.puesto);
-    // Si tienes más campos de Paso 1, añádelos aquí:
-    // fd.append('otroCampo', form.otroCampo);
+    // Añade aquí otros campos de pasos anteriores si los tienes:
+    // fd.append('campoPaso1', form.campoPaso1);
 
     try {
-      const res = await fetch('/api/estudios', {
+      const res = await fetch(`${API_BASE}/api/estudios`, {
         method: 'POST',
         body: fd,
       });
+
       if (!res.ok) {
         let errorData;
         try { errorData = await res.json(); }
@@ -46,20 +59,14 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         console.error('Error al subir estudio:', errorData);
         return;
       }
+
       const data = await res.json();
       console.log('Estudio guardado:', data);
       onNext();
-    } catch (error) {
-      console.error('Error de red al enviar estudio:', error);
+    } catch (err) {
+      console.error('Error de red al enviar estudio:', err);
     }
   };
-
-  // Habilita “Siguiente” solo si todo está completo
-  const canNext =
-    form.cv &&
-    form.nombreCandidato?.trim().length > 0 &&
-    form.ciudad?.trim().length > 0 &&
-    form.puesto?.trim().length > 0;
 
   return (
     <div className="container py-5">
