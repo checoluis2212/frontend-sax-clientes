@@ -1,6 +1,6 @@
 // src/components/Paso4.jsx
 import React, { useEffect } from 'react'
-import { crearSesionPago } from '../services/api'  // ✅ función correcta
+import { crearCheckout } from '../services/api' // ✅ función correcta
 
 export default function Paso4({ form }) {
   useEffect(() => {
@@ -9,7 +9,7 @@ export default function Paso4({ form }) {
         const visitorId = localStorage.getItem('visitorId') || null
         const datos = { ...form, visitorId, tipo: form.tipo || 'estandar' }
 
-        const { checkoutUrl } = await crearSesionPago(datos)
+        const { checkoutUrl } = await crearCheckout(datos)
         window.location.href = checkoutUrl
       } catch (err) {
         alert('Error al iniciar el pago')
@@ -27,4 +27,3 @@ export default function Paso4({ form }) {
     </div>
   )
 }
-
