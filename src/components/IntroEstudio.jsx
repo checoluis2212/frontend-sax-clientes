@@ -11,7 +11,7 @@ export default function IntroEstudio({ onStart }) {
             Solicita un estudio<br/>socioeconómico al instante
           </h1>
           <p className="mt-4">
-            <strong>Estándar $500 MXN</strong> |<strong>Urgente $800 MXN</strong>
+            Estándar $500 MXN | Urgente $800 MXN
           </p>
           <button
             className="btn btn-primary btn-lg mt-3"
@@ -49,6 +49,8 @@ export default function IntroEstudio({ onStart }) {
               href="https://wa.me/525512345678?text=Cotización%20volumen"
               target="_blank"
               rel="noopener noreferrer"
+              className="fw-bold"
+              style={{ color: '#28a745' }}
             >
               Contáctanos por WhatsApp
             </a>
