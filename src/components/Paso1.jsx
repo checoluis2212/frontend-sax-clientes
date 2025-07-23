@@ -82,13 +82,20 @@ export default function Paso1({ form, setForm, onNext }) {
       </div>
 
       <div className="mt-4">
-        <button
-          className="btn btn-primary"
-          onClick={onNext}
-          disabled={!canNext}
-        >
-          Siguiente
-        </button>
+       <button
+         className="btn btn-primary"
+        onClick={() => {
+          setForm(f => ({
+             ...f,
+             nombreSolicitante: `${f.nombre.trim()} ${f.apellido.trim()}`
+           }))
+          onNext()
+        }}
+        disabled={!canNext}
+>
+  Siguiente
+</button>
+
       </div>
     </div>
   )
