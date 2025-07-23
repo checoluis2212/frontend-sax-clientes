@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import IntroEstudio from '../components/IntroEstudio'
 import Paso1 from '../components/Paso1'
 import Paso2 from '../components/Paso2'
 import Paso3 from '../components/Paso3'
 import Paso4 from '../components/Paso4'
 import Header from '../components/Header'
+
 
 export default function PedirEstudio() {
   const [step, setStep] = useState(1)
