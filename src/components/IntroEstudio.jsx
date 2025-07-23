@@ -24,7 +24,7 @@ export default function IntroEstudio({ onStart }) {
 
         {/* DERECHA */}
         <div className="col-md-6">
-          <ol className="list-group list-group-numbered">
+          <ul className="list-group">
             <li className="list-group-item mb-3">
               <h5 className="mb-1">Paso 1: Tus datos personales</h5>
               <small>Nombre, apellido, empresa, teléfono y email.</small>
