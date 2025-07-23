@@ -7,12 +7,19 @@ export default function Paso4({ form }) {
     const enviarDatos = async () => {
       try {
         const visitorId = localStorage.getItem('visitorId') || null
-        const datos = { ...form, visitorId, tipo: form.tipo || 'estandar' }
+
+        const datos = {
+          ...form,
+          visitorId,
+          tipo: form.tipo || 'estandar',
+          nombreSolicitante: `${form.nombre} ${form.apellido}`.trim(),
+          nombreCandidato: form.nombreCandidato || 'Candidato no especificado'
+        }
 
         const { checkoutUrl } = await crearCheckout(datos)
         window.location.href = checkoutUrl
       } catch (err) {
-        alert('Error al iniciar el pago')
+        alert('❌ Error al iniciar el pago')
         console.error(err)
       }
     }
