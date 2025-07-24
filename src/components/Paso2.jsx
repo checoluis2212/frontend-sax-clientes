@@ -1,3 +1,4 @@
+// src/components/Paso2.jsx
 import React, { useState } from 'react';
 
 export default function Paso2({ form, setForm, onBack, onNext }) {
@@ -7,6 +8,9 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     ciudad: false,
     puesto: false,
   });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Handlers para inputs de texto
   const handleChange = (field) => (e) => {
@@ -23,7 +27,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     setForm((f) => ({ ...f, cv: file }));
   };
 
-  // Determina la URL base según entorno
+  // URL base según entorno
   const API_BASE =
     process.env.NODE_ENV === 'production'
       ? 'https://api.clientes.saxmexico.com'
@@ -38,33 +42,45 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
 
   // Envía el formulario con FormData
   const handleSubmitPaso2 = async () => {
-    const fd = new FormData();
-    fd.append('cv', form.cv);
-    fd.append('nombreCandidato', form.nombreCandidato);
-    fd.append('ciudad', form.ciudad);
-    fd.append('puesto', form.puesto);
-    // Añade aquí otros campos de pasos anteriores si los tienes:
-    // fd.append('campoPaso1', form.campoPaso1);
+    setSubmitting(true);
+    setSubmitError('');
 
     try {
+      const fd = new FormData();
+      fd.append('cv', form.cv);
+      fd.append('nombreCandidato', form.nombreCandidato);
+      fd.append('ciudad', form.ciudad);
+      fd.append('puesto', form.puesto);
+
+      // Si tu API lo requiere, añade aquí los campos del Paso 1:
+      // fd.append('nombreSolicitante', form.nombreSolicitante);
+      // fd.append('email', form.email);
+      // etc.
+
       const res = await fetch(`${API_BASE}/api/estudios`, {
         method: 'POST',
         body: fd,
       });
 
-// dentro de handleSubmitPaso2, después de recibir la respuesta…
-  if (res.ok) {
-  const { docId, cvUrl } = await res.json();
-  setForm(f => ({ ...f, docId, cvUrl }));
-  onNext();  // ahora tienes docId en form
-}
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || res.statusText);
+      }
 
+      // Solo una llamada a .json()
+      const { docId, cvUrl } = await res.json();
 
-      const data = await res.json();
-      console.log('Estudio guardado:', data);
+      // Guarda en el form el ID y la URL para pasos posteriores
+      setForm((f) => ({ ...f, docId, cvUrl }));
+
       onNext();
     } catch (err) {
       console.error('Error de red al enviar estudio:', err);
+      setSubmitError(
+        'No se pudo enviar la información. Por favor, intenta de nuevo más tarde.'
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -78,12 +94,14 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         <input
           type="file"
           accept=".pdf,.doc,.docx"
-          className={`form-control ${touched.cv && !form.cv ? 'is-invalid' : ''}`}
+          className={`form-control ${
+            touched.cv && !form.cv ? 'is-invalid' : ''
+          }`}
           onChange={handleFile}
         />
         {touched.cv && !form.cv && (
           <div className="invalid-feedback">
-            Debes seleccionar un archivo (.pdf, .doc, .docx)
+            Debes seleccionar un archivo (.pdf, .doc o .docx)
           </div>
         )}
       </div>
@@ -94,7 +112,9 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         <input
           type="text"
           className={`form-control ${
-            touched.nombreCandidato && !form.nombreCandidato?.trim() ? 'is-invalid' : ''
+            touched.nombreCandidato && !form.nombreCandidato?.trim()
+              ? 'is-invalid'
+              : ''
           }`}
           value={form.nombreCandidato || ''}
           onChange={handleChange('nombreCandidato')}
@@ -139,17 +159,26 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         </div>
       </div>
 
+      {/* Error de envío */}
+      {submitError && (
+        <div className="alert alert-danger mt-4">{submitError}</div>
+      )}
+
       {/* Botones */}
       <div className="d-flex justify-content-between mt-4">
-        <button className="btn btn-outline-secondary" onClick={onBack}>
+        <button
+          className="btn btn-outline-secondary"
+          onClick={onBack}
+          disabled={submitting}
+        >
           Atrás
         </button>
         <button
           className="btn btn-primary"
           onClick={handleSubmitPaso2}
-          disabled={!canNext}
+          disabled={!canNext || submitting}
         >
-          Siguiente
+          {submitting ? 'Enviando…' : 'Siguiente'}
         </button>
       </div>
     </div>
