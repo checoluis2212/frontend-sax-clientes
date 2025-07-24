@@ -74,7 +74,7 @@ export default function PedirEstudio() {
       {/* Header fijo… */}
       <header className="bg-white shadow-sm py-3 mb-4">
         <div className="container d-flex justify-content-between align-items-center">
-          <img src="/sax.png" alt="SAX Services" height="60" />
+          <img src="/sax.png" alt="SAX Services" height="130" />
           <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
         </div>
       </header>
