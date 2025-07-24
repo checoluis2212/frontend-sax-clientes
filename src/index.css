@@ -66,11 +66,41 @@ button:focus-visible {
   }
 }
 
-form-check-input {
-  accent-color: var(--bs-primary);
+
+/* Make radios ourselves so siempre veas el color primary */
+
+/* 1) Quitamos la apariencia nativa */
+.form-check-input {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid var(--bs-primary);
+  border-radius: 50%;
+  position: relative;
+  margin-top: 0.3em; /* alinea con el texto */
+  cursor: pointer;
 }
 
-.form-check-input:checked {
+/* 2) Pintamos el punto interior cuando está checked */
+.form-check-input:checked::before {
+  content: '';
+  display: block;
+  width: 0.6em;
+  height: 0.6em;
   background-color: var(--bs-primary);
-  border-color: var(--bs-primary);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 3) Conserva el estilo de invalid si hay error */
+.form-check-input.is-invalid {
+  border-color: #dc3545;
+}
+.form-check-input.is-invalid:checked::before {
+  background-color: #dc3545;
 }
