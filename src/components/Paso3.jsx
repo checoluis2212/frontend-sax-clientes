@@ -1,17 +1,21 @@
+import React from 'react'
+// src/components/Paso3.jsx
 import React, { useState, useEffect } from 'react';
 
 export default function Paso3({ form, setForm, onBack, onNext }) {
   const tipos = [
     { value: 'estandar', label: 'Estándar ($500 MXN)' },
     { value: 'urgente',  label: 'Urgente ($800 MXN)' },
+  ]
+  const canNext = form.tipo !== ''
   ];
 
-  // Estado local para controlar si ya intentaste avanzar
+  // ¿El usuario ya tocó alguna opción?
   const [touched, setTouched] = useState(false);
-  // Texto de error
+  // Texto de error si no hay selección
   const [error, setError] = useState('');
 
-  // Cada vez que cambie form.tipo o touched, validamos
+  // Cada vez que cambie form.tipo o touched, re-valida
   useEffect(() => {
     if (touched && form.tipo === '') {
       setError('Selecciona una opción');
@@ -20,52 +24,55 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
     }
   }, [form.tipo, touched]);
 
-  // Sólo puedes avanzar si ya hay algo seleccionado
+  // Puede avanzar sólo si hay tipo seleccionado
   const canNext = form.tipo !== '';
 
-  const handleChange = (e) => {
-    setForm(f => ({ ...f, tipo: e.target.value }));
-    // Marcamos que ya tocaste (evita mostrar error antes de la primera interacción)
+  const handleChange = (value) => {
+    setForm(f => ({ ...f, tipo: value }));
     setTouched(true);
-  };
-
-  const handleNext = () => {
-    setTouched(true);
-    if (canNext) {
-      onNext();
-    }
   };
 
   return (
-    <div className="container py-4">
-      <h3>Paso 3: Elige el tipo de estudio</h3>
+    <div className="container py-5">
+      <h4 className="mb-4 fw-bold">Paso 3: Elige el tipo de estudio</h4>
+      <div className="mb-4">
+        {tipos.map(t => (
+          <div className="form-check" key={t.value}>
 
-      <div className="mt-3">
+      <div className="mb-3">
         {tipos.map(({ value, label }) => (
-          <div key={value} className="form-check mb-2">
+          <div className="form-check mb-2" key={value}>
             <input
               className="form-check-input"
+              className={`form-check-input ${error ? 'is-invalid' : ''}`}
               type="radio"
               name="tipo"
-              id={`tipo-${value}`}
+              id={t.value}
+              value={t.value}
+              checked={form.tipo === t.value}
+              onChange={() => setForm(f => ({ ...f, tipo: t.value }))}
+              id={value}
               value={value}
               checked={form.tipo === value}
-              onChange={handleChange}
+              onChange={() => handleChange(value)}
             />
-            <label className="form-check-label" htmlFor={`tipo-${value}`}>
+            <label className="form-check-label" htmlFor={t.value}>
+              {t.label}
+            <label className="form-check-label" htmlFor={value}>
               {label}
             </label>
           </div>
         ))}
 
         {error && (
-          <div className="text-danger mb-3">
+          <div className="invalid-feedback d-block">
             {error}
           </div>
         )}
       </div>
 
       <div className="d-flex justify-content-between">
+        <button className="btn btn-outline-secondary" onClick={onBack}>
         <button
           type="button"
           className="btn btn-outline-secondary"
@@ -73,15 +80,17 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
         >
           Atrás
         </button>
-
+        <button className="btn btn-primary" onClick={onNext} disabled={!canNext}>
         <button
           type="button"
           className="btn btn-primary"
-          onClick={handleNext}
+          onClick={onNext}
+          disabled={!canNext}
         >
           Siguiente
         </button>
       </div>
     </div>
+  )
   );
 }
