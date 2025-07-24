@@ -65,3 +65,12 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+form-check-input {
+  accent-color: var(--bs-primary);
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
