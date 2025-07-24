@@ -3,58 +3,67 @@ import React, { useState, useEffect } from 'react';
 
 export default function Paso3({ form, setForm, onBack, onNext }) {
   const tipos = [
-    { value: 'estandar', label: 'Estándar ($500 MXN)' },
-    { value: 'urgente',  label: 'Urgente ($800 MXN)' },
+    { value: 'estandar', label: 'Estándar ($500 MXN)' },
+    { value: 'urgente',  label: 'Urgente ($800 MXN)' },
   ];
 
-  // Estado local
   const [touched, setTouched] = useState(false);
-  const [error, setError] = useState('');
+  const [fieldError, setFieldError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
-  // Valida cada vez que cambie la selección o se haya tocado
+  // Validar tras interacción
   useEffect(() => {
-    if (touched && form.tipo === '') {
-      setError('Selecciona una opción');
+    if (touched && !form.tipo) {
+      setFieldError('Selecciona una opción');
     } else {
-      setError('');
+      setFieldError('');
     }
   }, [form.tipo, touched]);
 
-  // Puede avanzar si hay tipo seleccionado y no está enviando
-  const canSubmit = form.tipo !== '' && !submitting;
-
-  // Cuando el usuario selecciona un radio
+  // Cambio de radio
   const handleChange = (value) => {
-    setForm(prev => ({ ...prev, tipo: value }));
+    setForm(f => ({ ...f, tipo: value }));
     setTouched(true);
   };
 
-  // Envía el formulario al backend
+  // Enviar elección al servidor
   const handleSubmit = async () => {
+    setSubmitError('');
     setSubmitting(true);
+
+    // Validación previa
+    if (!form.tipo) {
+      setFieldError('Selecciona una opción');
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const res = await fetch('/api/estudios', {
+      const res = await fetch('/api/estudios/seleccion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          docId: form.docId,
+          tipo: form.tipo,
+        }),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || res.statusText);
+        const errText = await res.text();
+        throw new Error(errText || res.statusText);
       }
 
-      // Solo una llamada a json()
-      const data = await res.json();
-      console.log('Servidor respondió:', data);
+      // Leer JSON solo si existe
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        await res.json();
+      }
 
-      // Una vez enviado, avanza
       onNext();
     } catch (err) {
-      console.error('Error al enviar estudio:', err);
-      // Aquí podrías agregar un toast o mostrar el error en UI
-      setError('Hubo un problema al enviar. Intenta de nuevo.');
+      console.error('Error al enviar tipo de estudio:', err);
+      setSubmitError('No se pudo guardar tu elección. Intenta de nuevo.');
     } finally {
       setSubmitting(false);
     }
@@ -68,11 +77,10 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
         {tipos.map(({ value, label }) => (
           <div className="form-check mb-2" key={value}>
             <input
-              className={`form-check-input ${error ? 'is-invalid' : ''}`}
               type="radio"
               name="tipo"
               id={value}
-              value={value}
+              className={`form-check-input ${fieldError ? 'is-invalid' : ''}`}
               checked={form.tipo === value}
               onChange={() => handleChange(value)}
             />
@@ -82,12 +90,18 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
           </div>
         ))}
 
-        {error && (
+        {fieldError && (
           <div className="invalid-feedback d-block">
-            {error}
+            {fieldError}
           </div>
         )}
       </div>
+
+      {submitError && (
+        <div className="alert alert-danger">
+          {submitError}
+        </div>
+      )}
 
       <div className="d-flex justify-content-between">
         <button
@@ -102,9 +116,9 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
           type="button"
           className="btn btn-primary"
           onClick={handleSubmit}
-          disabled={!canSubmit}
+          disabled={submitting}
         >
-          {submitting ? 'Enviando…' : 'Siguiente'}
+          {submitting ? 'Guardando…' : 'Siguiente'}
         </button>
       </div>
     </div>
