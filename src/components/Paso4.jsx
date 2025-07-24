@@ -22,9 +22,14 @@ export default function Paso4({ form, onBack }) {
       }
 
       const { checkoutUrl } = await crearCheckout(payload)
-      // Limpia el paso guardado si usas localStorage para el step
+
+      // ── Limpieza de localStorage ───────────────────────────
       localStorage.removeItem('pedirEstudioStep')
-      // Redirige a Stripe
+      localStorage.removeItem('estudioDocId')
+      localStorage.removeItem('estudioCvUrl')
+      // Opcional: localStorage.removeItem('visitorId')
+
+      // ── Redirigir a Stripe ─────────────────────────────────
       window.location.href = checkoutUrl
     } catch (err) {
       console.error('❌ Error al iniciar el pago:', err)
