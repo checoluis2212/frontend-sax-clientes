@@ -7,12 +7,12 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
     { value: 'urgente',  label: 'Urgente ($800 MXN)' },
   ];
 
-  // ¿El usuario ya tocó alguna opción?
+  // Estado local
   const [touched, setTouched] = useState(false);
-  // Texto de error si no hay selección
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  // Cada vez que cambie form.tipo o touched, re-valida
+  // Valida cada vez que cambie la selección o se haya tocado
   useEffect(() => {
     if (touched && form.tipo === '') {
       setError('Selecciona una opción');
@@ -21,12 +21,43 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
     }
   }, [form.tipo, touched]);
 
-  // Puede avanzar sólo si hay tipo seleccionado
-  const canNext = form.tipo !== '';
+  // Puede avanzar si hay tipo seleccionado y no está enviando
+  const canSubmit = form.tipo !== '' && !submitting;
 
+  // Cuando el usuario selecciona un radio
   const handleChange = (value) => {
-    setForm(f => ({ ...f, tipo: value }));
+    setForm(prev => ({ ...prev, tipo: value }));
     setTouched(true);
+  };
+
+  // Envía el formulario al backend
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/estudios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || res.statusText);
+      }
+
+      // Solo una llamada a json()
+      const data = await res.json();
+      console.log('Servidor respondió:', data);
+
+      // Una vez enviado, avanza
+      onNext();
+    } catch (err) {
+      console.error('Error al enviar estudio:', err);
+      // Aquí podrías agregar un toast o mostrar el error en UI
+      setError('Hubo un problema al enviar. Intenta de nuevo.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -63,16 +94,17 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
           type="button"
           className="btn btn-outline-secondary"
           onClick={onBack}
+          disabled={submitting}
         >
           Atrás
         </button>
         <button
           type="button"
           className="btn btn-primary"
-          onClick={onNext}
-          disabled={!canNext}
+          onClick={handleSubmit}
+          disabled={!canSubmit}
         >
-          Siguiente
+          {submitting ? 'Enviando…' : 'Siguiente'}
         </button>
       </div>
     </div>
