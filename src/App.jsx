@@ -1,8 +1,9 @@
+// src/App.jsx
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PedirEstudio from "./pages/PedirEstudio";
 import Gracias from './pages/Gracias';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { useEffect } from 'react';
 
 function App() {
   useEffect(() => {
@@ -16,7 +17,6 @@ function App() {
         console.error('❌ Error cargando FingerprintJS:', err);
       }
     };
-
     if (!localStorage.getItem('visitorId')) {
       initFingerprint();
     }
@@ -26,7 +26,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<PedirEstudio />} />
-        <Route path="/gracias" element={<h1>Gracias por tu compra 🎉</h1>} />
+        <Route path="/gracias" element={<Gracias />} />
       </Routes>
     </BrowserRouter>
   );
