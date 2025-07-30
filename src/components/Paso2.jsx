@@ -47,31 +47,37 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
       fd.append('nombreCandidato', form.nombreCandidato);
       fd.append('ciudad', form.ciudad);
       fd.append('puesto', form.puesto);
-
-      // Si tu API lo requiere, añade aquí los campos del Paso 1:
+      // si necesitas otros campos de Paso 1, añádelos aquí:
       // fd.append('nombreSolicitante', form.nombreSolicitante);
       // fd.append('email', form.email);
-      // etc.
 
       const res = await fetch(`${API_BASE}/api/estudios`, {
         method: 'POST',
         body: fd,
       });
 
+      // 1) Errores HTTP
       if (!res.ok) {
         const errText = await res.text();
         throw new Error(errText || res.statusText);
       }
 
-      // Solo una llamada a .json()
-      const { docId, cvUrl, checkoutUrl } = await res.json();
+      // 2) Errores de negocio
+      const data = await res.json();
+      if (data.ok === false) {
+        throw new Error(data.error || 'Fallo creando el estudio');
+      }
 
-      // Guarda en el form el ID, la URL y la checkout URL
-      setForm((f) => ({ ...f, docId, cvUrl, checkoutUrl }));
+      // 3) Extraemos únicamente lo que existe
+      const { docId, cvUrl } = data;
 
+      // 4) Guardamos en el form
+      setForm((f) => ({ ...f, docId, cvUrl }));
+
+      // 5) Avanzamos al siguiente paso
       onNext();
     } catch (err) {
-      console.error('Error de red al enviar estudio:', err);
+      console.error('Error de red o negocio al enviar estudio:', err);
       setSubmitError(
         'No se pudo enviar la información. Por favor, intenta de nuevo más tarde.'
       );
@@ -90,9 +96,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         <input
           type="file"
           accept=".pdf,.doc,.docx"
-          className={`form-control ${
-            touched.cv && !form.cv ? 'is-invalid' : ''
-          }`}
+          className={`form-control ${touched.cv && !form.cv ? 'is-invalid' : ''}`}
           onChange={handleFile}
         />
         {touched.cv && !form.cv && (
@@ -108,9 +112,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
         <input
           type="text"
           className={`form-control ${
-            touched.nombreCandidato && !form.nombreCandidato?.trim()
-              ? 'is-invalid'
-              : ''
+            touched.nombreCandidato && !form.nombreCandidato?.trim() ? 'is-invalid' : ''
           }`}
           value={form.nombreCandidato || ''}
           onChange={handleChange('nombreCandidato')}
@@ -127,9 +129,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
           <label className="form-label">Ciudad del candidato</label>
           <input
             type="text"
-            className={`form-control ${
-              touched.ciudad && !form.ciudad?.trim() ? 'is-invalid' : ''
-            }`}
+            className={`form-control ${touched.ciudad && !form.ciudad?.trim() ? 'is-invalid' : ''}`}
             value={form.ciudad || ''}
             onChange={handleChange('ciudad')}
             onBlur={handleBlur('ciudad')}
@@ -142,9 +142,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
           <label className="form-label">Puesto solicitado</label>
           <input
             type="text"
-            className={`form-control ${
-              touched.puesto && !form.puesto?.trim() ? 'is-invalid' : ''
-            }`}
+            className={`form-control ${touched.puesto && !form.puesto?.trim() ? 'is-invalid' : ''}`}
             value={form.puesto || ''}
             onChange={handleChange('puesto')}
             onBlur={handleBlur('puesto')}
