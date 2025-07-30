@@ -1,6 +1,6 @@
+// src/pages/PedirEstudio.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 import IntroEstudio from '../components/IntroEstudio';
 import Paso1 from '../components/Paso1';
@@ -8,17 +8,14 @@ import Paso2 from '../components/Paso2';
 import Paso3 from '../components/Paso3';
 import Paso4 from '../components/Paso4';
 
-export default function PedirEstudio() {
+export default function PedirEstudio({ visitorId }) {
   const navigate = useNavigate();
 
-  // 1) Inicializamos el paso leyendo localStorage (si existe)
-  const [step, setStep] = useState(() => {
-    const saved = localStorage.getItem('pedirEstudioStep');
-    return saved !== null ? Number(saved) : 0;
-  });
+  // 1) Siempre arrancamos en el Intro (step 0)
+  const [step, setStep] = useState(0);
 
-  // 2) Estado de formulario inicial, leyendo docId y cvUrl de localStorage
-  const [form, setForm] = useState(() => ({
+  // 2) Estado inicial del formulario, sin localStorage
+  const [form, setForm] = useState({
     nombre: '',
     apellido: '',
     empresa: '',
@@ -29,49 +26,27 @@ export default function PedirEstudio() {
     ciudad: '',
     puesto: '',
     cv: null,
-    docId: localStorage.getItem('estudioDocId') || '',
-    cvUrl: localStorage.getItem('estudioCvUrl') || '',
+    docId: '',
+    cvUrl: '',
     tipo: '',
-    visitorId: ''
-  }));
+    visitorId: ''    // se seteará desde la prop
+  });
 
-  // 3) Guardar step en localStorage cada vez que cambie
+  // 3) Cuando recibimos visitorId en props, lo volcamos al form
   useEffect(() => {
-    localStorage.setItem('pedirEstudioStep', step);
-  }, [step]);
-
-  // 4) Guardar docId y cvUrl en localStorage cuando se actualicen
-  useEffect(() => {
-    if (form.docId) localStorage.setItem('estudioDocId', form.docId);
-    if (form.cvUrl) localStorage.setItem('estudioCvUrl', form.cvUrl);
-  }, [form.docId, form.cvUrl]);
-
-  // 5) Si ya hay docId y estamos antes del Paso 3, saltar al Paso 3
-  useEffect(() => {
-    if (form.docId && step < 3) setStep(3);
-  }, [form.docId, step]);
-
-  // FingerprintJS: capturar visitorId
-  useEffect(() => {
-    if (!form.visitorId) {
-      FingerprintJS.load()
-        .then(fp => fp.get())
-        .then(res => setForm(f => ({ ...f, visitorId: res.visitorId })))
-        .catch(console.error);
+    if (visitorId) {
+      setForm(f => ({ ...f, visitorId }));
     }
-  }, [form.visitorId]);
+  }, [visitorId]);
 
-  // Al finalizar (Paso 4) limpiamos el paso y los datos persistidos
+  // 4) Función para limpiar y navegar al final
   const finish = () => {
-    localStorage.removeItem('pedirEstudioStep');
-    localStorage.removeItem('estudioDocId');
-    localStorage.removeItem('estudioCvUrl');
     navigate('/gracias');
   };
 
   return (
     <>
-      {/* Header fijo… */}
+      {/* Header fijo */}
       <header className="bg-white shadow-sm py-3 mb-4">
         <div className="container d-flex justify-content-between align-items-center">
           <img src="/sax.png" alt="SAX Services" height="130" />
