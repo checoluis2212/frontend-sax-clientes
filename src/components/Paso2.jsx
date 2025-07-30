@@ -8,7 +8,6 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     ciudad: false,
     puesto: false,
   });
-
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
@@ -27,11 +26,8 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
     setForm((f) => ({ ...f, cv: file }));
   };
 
-  // URL base según entorno
-  const API_BASE =
-    process.env.NODE_ENV === 'production'
-      ? 'https://api.clientes.saxmexico.com'
-      : '';
+  // URL base según entorno (leer de .env.production)
+  const API_BASE = import.meta.env.VITE_API_URL || '';
 
   // Comprueba si puede avanzar
   const canNext =
@@ -52,7 +48,7 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
       fd.append('ciudad', form.ciudad);
       fd.append('puesto', form.puesto);
 
-      // Si tu API lo requiere, añade aquí los campos del Paso 1:
+      // Si tu API lo requiere, añade aquí los campos del Paso 1:
       // fd.append('nombreSolicitante', form.nombreSolicitante);
       // fd.append('email', form.email);
       // etc.
@@ -68,10 +64,10 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
       }
 
       // Solo una llamada a .json()
-      const { docId, cvUrl } = await res.json();
+      const { docId, cvUrl, checkoutUrl } = await res.json();
 
-      // Guarda en el form el ID y la URL para pasos posteriores
-      setForm((f) => ({ ...f, docId, cvUrl }));
+      // Guarda en el form el ID, la URL y la checkout URL
+      setForm((f) => ({ ...f, docId, cvUrl, checkoutUrl }));
 
       onNext();
     } catch (err) {
