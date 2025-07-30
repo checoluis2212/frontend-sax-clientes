@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { guardarSolicitud } from '../services/api';
+import { createEstudio } from '../services/api'; // 🔄 Usamos createEstudio
 
 export default function Paso3({ form, setForm, onBack, onNext }) {
   const tipos = [
@@ -28,7 +28,7 @@ export default function Paso3({ form, setForm, onBack, onNext }) {
       setError('');
 
       console.log('DEBUG Paso3 envío a backend:', form);
-      const res = await guardarSolicitud(form); // Backend crea cliente/submission
+      const res = await createEstudio(form); // 🔄 Usamos createEstudio
       console.log('DEBUG Paso3 respuesta backend:', res);
 
       if (!res.ok || !res.docId) {
