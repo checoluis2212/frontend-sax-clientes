@@ -1,32 +1,35 @@
 // src/App.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PedirEstudio from "./pages/PedirEstudio";
 import Gracias from './pages/Gracias';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 function App() {
+  const [visitorId, setVisitorId] = useState(null);
+
   useEffect(() => {
     const initFingerprint = async () => {
       try {
         const fp = await FingerprintJS.load();
-        const result = await fp.get();
-        localStorage.setItem('visitorId', result.visitorId);
-        console.log('✅ visitorId guardado:', result.visitorId);
+        const { visitorId } = await fp.get();
+        setVisitorId(visitorId);
+        console.log('✅ visitorId obtenido:', visitorId);
       } catch (err) {
         console.error('❌ Error cargando FingerprintJS:', err);
       }
     };
-    if (!localStorage.getItem('visitorId')) {
-      initFingerprint();
-    }
+    initFingerprint();
   }, []);
+
+  // Mientras no lo tengas, muestra un loader o nada
+  if (!visitorId) return <div>Cargando…</div>;
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PedirEstudio />} />
-        <Route path="/gracias" element={<Gracias />} />
+        <Route path="/" element={<PedirEstudio visitorId={visitorId} />} />
+        <Route path="/gracias" element={<Gracias visitorId={visitorId} />} />
       </Routes>
     </BrowserRouter>
   );
