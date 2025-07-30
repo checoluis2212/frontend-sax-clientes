@@ -1,3 +1,4 @@
+// src/components/Paso2.jsx
 import React, { useState } from 'react';
 
 export default function Paso2({ form, setForm, onBack, onNext }) {
@@ -31,7 +32,10 @@ export default function Paso2({ form, setForm, onBack, onNext }) {
 
     try {
       const fd = new FormData();
-      fd.append('cv', form.cv);
+      // Incluimos visitorId
+      fd.append('visitorId', form.visitorId);
+      // Campos del candidato
+      fd.append('cv', form.cv, form.cv.name);
       fd.append('nombreCandidato', form.nombreCandidato);
       fd.append('ciudad', form.ciudad);
       fd.append('puesto', form.puesto);
