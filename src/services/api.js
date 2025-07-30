@@ -7,10 +7,12 @@ export async function createEstudio(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Error ${res.status}: ${text}`);
   }
+
   return res.json(); // { ok, docId, cvUrl }
 }
 
@@ -21,9 +23,11 @@ export async function crearCheckout(datos) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(datos),
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Error ${res.status}: ${text}`);
   }
+
   return res.json(); // { checkoutUrl }
 }
