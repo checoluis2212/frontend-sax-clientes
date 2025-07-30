@@ -11,12 +11,14 @@ export default function Paso4({ form, onBack }) {
     setLoading(true);
 
     try {
-      console.log('DEBUG Paso4 form:', form);
+      console.log('DEBUG Paso4 form recibido:', form);
 
+      // Validación de datos críticos
       if (!docId || !tipo) {
         throw new Error('Faltan datos para iniciar el pago (docId/tipo)');
       }
 
+      // Armado de payload para backend
       const payload = {
         docId,
         tipo,
@@ -25,13 +27,18 @@ export default function Paso4({ form, onBack }) {
         nombreSolicitante: `${nombre} ${apellido}`.trim(),
       };
 
-      console.log('DEBUG Paso4 payload checkout:', payload);
+      console.log('DEBUG Paso4 payload enviado:', payload);
+
+      // Llamada al backend
       const { checkoutUrl } = await crearCheckout(payload);
 
       if (!checkoutUrl) {
         throw new Error('No se recibió checkoutUrl');
       }
 
+      console.log('✅ Checkout URL recibida:', checkoutUrl);
+
+      // Redirigir a Stripe
       window.location.href = checkoutUrl;
     } catch (err) {
       console.error('❌ Error al iniciar el pago:', err);
