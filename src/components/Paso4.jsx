@@ -1,7 +1,8 @@
+// src/components/Paso4.jsx
 import React, { useEffect } from 'react';
 import { crearCheckout } from '../services/api';
 
-export default function Paso4({ form, onBack, onFinish }) {
+export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
   useEffect(() => {
     const solicitudPendiente = {
       docId: form.docId,
@@ -35,6 +36,10 @@ export default function Paso4({ form, onBack, onFinish }) {
     <div className="container py-5">
       <h4 className="mb-4 fw-bold">Resumen antes de pagar</h4>
 
+      {mensajeCancelado && (
+        <div className="alert alert-warning">{mensajeCancelado}</div>
+      )}
+
       <p><strong>CV enviado:</strong> <a href={form.cvUrl} target="_blank" rel="noreferrer">Ver archivo</a></p>
       <p><strong>Nombre candidato:</strong> {form.nombreCandidato}</p>
       <p><strong>Ciudad:</strong> {form.ciudad}</p>
@@ -49,8 +54,10 @@ export default function Paso4({ form, onBack, onFinish }) {
       <div className="d-flex justify-content-between mt-4">
         <button className="btn btn-outline-secondary" onClick={onBack}>Atrás</button>
         <div>
-          <button className="btn btn-danger me-2" onClick={handleNueva}>Iniciar solicitud nueva</button>
-          <button className="btn btn-primary" onClick={handleCheckout}>Ir a pagar</button>
+          <button className="btn btn-danger me-2" onClick={handleNueva}>Iniciar nueva</button>
+          <button className="btn btn-primary" onClick={handleCheckout}>
+            {mensajeCancelado ? 'Reintentar pago' : 'Ir a pagar'}
+          </button>
         </div>
       </div>
     </div>
