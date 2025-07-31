@@ -33,28 +33,28 @@ export default function PedirEstudio({ visitorId }) {
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
   useEffect(() => {
-    if (visitorId) {
-      setForm(f => ({ ...f, visitorId }));
+  if (!visitorId) return;
 
-      const pendiente = localStorage.getItem('solicitudPendiente');
-      if (pendiente) {
-        const data = JSON.parse(pendiente);
+  setForm(f => ({ ...f, visitorId }));
 
-        const urlParams = new URLSearchParams(location.search);
-        if (urlParams.get('cancelado') === 'true') {
-          setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
-        }
+  const pendiente = localStorage.getItem('solicitudPendiente');
+  if (pendiente) {
+    const data = JSON.parse(pendiente);
 
-        if (data.pasoActual === 4 && (!data.statusPago || data.statusPago === 'no_pagado')) {
-          setForm(f => ({ ...f, ...data }));
-          setStep(4);
-        } else {
-          setForm(f => ({ ...f, ...data }));
-          setStep(data.pasoActual || 0);
-        }
-      }
+    // Mostrar mensaje si canceló en Stripe
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('cancelado') === 'true') {
+      setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
     }
-  }, [visitorId, location.search]);
+
+    // Restaurar todos los datos
+    setForm(f => ({ ...f, ...data }));
+
+    // Forzar que arranque en el paso guardado
+    setStep(data.pasoActual || 0);
+  }
+}, [visitorId]);
+
 
   const finish = () => {
     localStorage.removeItem('solicitudPendiente');
