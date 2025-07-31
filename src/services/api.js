@@ -1,21 +1,33 @@
-router.delete('/:clientId/:docId', async (req, res) => {
-  try {
-    const { clientId, docId } = req.params;
-    const clientRef = db.collection('clientes').doc(clientId);
-    const submissionRef = clientRef.collection('submissions').doc(docId);
+const API_BASE = import.meta.env.VITE_API_URL || 'https://clientes.saxmexico.com';
 
-    // Eliminar submission
-    await submissionRef.delete();
+// 🔹 Crear estudio
+export async function createEstudio(payload) {
+  const url = `${API_BASE}/api/estudios`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
 
-    // Verificar si quedan otros submissions
-    const remaining = await clientRef.collection('submissions').get();
-    if (remaining.empty) {
-      await clientRef.delete();
-    }
+// 🔹 Crear checkout
+export async function crearCheckout(datos) {
+  const url = `${API_BASE}/api/checkout`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
 
-    res.json({ ok: true });
-  } catch (e) {
-    console.error('❌ Error eliminando solicitud:', e);
-    res.status(500).json({ ok: false, error: 'Error eliminando solicitud' });
-  }
-});
+// 🔹 Borrar solicitud (cliente + submission)
+export async function borrarSolicitud(clientId, docId) {
+  const url = `${API_BASE}/api/estudios/${clientId}/${docId}`;
+  const res = await fetch(url, { method: 'DELETE' });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
