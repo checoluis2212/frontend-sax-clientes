@@ -7,6 +7,8 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 function App() {
   const [visitorId, setVisitorId] = useState(null);
+  const [initialForm, setInitialForm] = useState({});
+  const [initialStep, setInitialStep] = useState(1);
 
   useEffect(() => {
     const initFingerprint = async () => {
@@ -15,6 +17,15 @@ function App() {
         const { visitorId } = await fp.get();
         setVisitorId(visitorId);
         console.log('✅ visitorId obtenido:', visitorId);
+
+        // 🔹 Revisar si hay solicitud pendiente
+        const pendiente = localStorage.getItem('solicitudPendiente');
+        if (pendiente) {
+          const data = JSON.parse(pendiente);
+          console.log('📂 Solicitud pendiente encontrada:', data);
+          setInitialForm(data);
+          setInitialStep(data.pasoActual || 1);
+        }
       } catch (err) {
         console.error('❌ Error cargando FingerprintJS:', err);
       }
@@ -22,13 +33,21 @@ function App() {
     initFingerprint();
   }, []);
 
-  // Mientras no lo tengas, muestra un loader o nada
   if (!visitorId) return <div>Cargando…</div>;
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PedirEstudio visitorId={visitorId} />} />
+        <Route
+          path="/"
+          element={
+            <PedirEstudio
+              visitorId={visitorId}
+              initialForm={initialForm}
+              initialStep={initialStep}
+            />
+          }
+        />
         <Route path="/gracias" element={<Gracias visitorId={visitorId} />} />
       </Routes>
     </BrowserRouter>
