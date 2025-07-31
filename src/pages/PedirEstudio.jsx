@@ -11,10 +11,8 @@ import Paso4 from '../components/Paso4';
 export default function PedirEstudio({ visitorId }) {
   const navigate = useNavigate();
 
-  // 1) Siempre arrancamos en el Intro (step 0)
+  // ─── Estado inicial ───────────────────────────────
   const [step, setStep] = useState(0);
-
-  // 2) Estado inicial del formulario, sin localStorage
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
@@ -29,24 +27,50 @@ export default function PedirEstudio({ visitorId }) {
     docId: '',
     cvUrl: '',
     tipo: '',
-    visitorId: ''    // se seteará desde la prop
+    amount: '',
+    visitorId: ''
   });
 
-  // 3) Cuando recibimos visitorId en props, lo volcamos al form
+  // ─── Cargar visitorId y solicitud pendiente ────────
   useEffect(() => {
     if (visitorId) {
       setForm(f => ({ ...f, visitorId }));
+
+      // Verificar si hay solicitud pendiente en localStorage
+      const pendiente = localStorage.getItem('solicitudPendiente');
+      if (pendiente) {
+        const data = JSON.parse(pendiente);
+        console.log('📂 Solicitud pendiente encontrada:', data);
+
+        // Cargar form y paso
+        setForm(f => ({ ...f, ...data }));
+        setStep(data.pasoActual || 0);
+      }
     }
   }, [visitorId]);
 
-  // 4) Función para limpiar y navegar al final
+  // ─── Guardar solicitud en localStorage cuando cambia paso importante ─
+  useEffect(() => {
+    if (form.docId && step >= 2) { 
+      const solicitudPendiente = {
+        ...form,
+        pasoActual: step
+      };
+      localStorage.setItem('solicitudPendiente', JSON.stringify(solicitudPendiente));
+      console.log('💾 Solicitud guardada en localStorage (Paso', step, ')');
+    }
+  }, [form, step]);
+
+  // ─── Finalizar ────────────────────────────────────
   const finish = () => {
+    localStorage.removeItem('solicitudPendiente'); // Limpiar al terminar
     navigate('/gracias');
   };
 
+  // ─── Render ───────────────────────────────────────
   return (
     <>
-      {/* Header fijo */}
+      {/* Header */}
       <header className="bg-white shadow-sm py-3 mb-4">
         <div className="container d-flex justify-content-between align-items-center">
           <img src="/sax.png" alt="SAX Services" height="130" />
@@ -54,6 +78,7 @@ export default function PedirEstudio({ visitorId }) {
         </div>
       </header>
 
+      {/* Contenido */}
       <div className="container mb-5">
         {step === 0 && <IntroEstudio onStart={() => setStep(1)} />}
 
