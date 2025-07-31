@@ -2,23 +2,24 @@ import React, { useState } from 'react';
 import { crearCheckout } from '../services/api';
 
 export default function Paso4({ form, onBack }) {
-  const { visitorId, docId, tipo, nombre, apellido, cac = 0 } = form;
+  const { visitorId, docId, tipo, nombre, apellido, nombreCandidato, puesto, cvUrl, cac = 0 } = form;
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+
+  const tipos = {
+    estandar: { label: 'Estándar', precio: 500, plazo: '7 días hábiles' },
+    urgente:  { label: 'Urgente', precio: 800, plazo: '3 días hábiles' }
+  };
+
+  const tipoInfo = tipos[tipo] || {};
 
   const handleCheckout = async () => {
     setError('');
     setLoading(true);
 
     try {
-      console.log('DEBUG Paso4 form recibido:', form);
+      if (!docId || !tipo) throw new Error('Faltan datos para iniciar el pago');
 
-      // Validación de datos críticos
-      if (!docId || !tipo) {
-        throw new Error('Faltan datos para iniciar el pago (docId/tipo)');
-      }
-
-      // Armado de payload para backend
       const payload = {
         docId,
         tipo,
@@ -27,18 +28,9 @@ export default function Paso4({ form, onBack }) {
         nombreSolicitante: `${nombre} ${apellido}`.trim(),
       };
 
-      console.log('DEBUG Paso4 payload enviado:', payload);
-
-      // Llamada al backend
       const { checkoutUrl } = await crearCheckout(payload);
+      if (!checkoutUrl) throw new Error('No se recibió checkoutUrl');
 
-      if (!checkoutUrl) {
-        throw new Error('No se recibió checkoutUrl');
-      }
-
-      console.log('✅ Checkout URL recibida:', checkoutUrl);
-
-      // Redirigir a Stripe
       window.location.href = checkoutUrl;
     } catch (err) {
       console.error('❌ Error al iniciar el pago:', err);
@@ -50,8 +42,31 @@ export default function Paso4({ form, onBack }) {
 
   return (
     <div className="container py-5">
-      <h4 className="fw-bold">Redirigiendo a pasarela de pago…</h4>
+      <h4 className="fw-bold mb-4">Resumen antes de pagar</h4>
+
+      {/* CV */}
+      {cvUrl && (
+        <div className="mb-3">
+          <strong>CV enviado:</strong>{' '}
+          <a href={cvUrl} target="_blank" rel="noopener noreferrer">Ver archivo</a>
+        </div>
+      )}
+
+      {/* Nombre y puesto */}
+      <div className="mb-2"><strong>Nombre candidato:</strong> {nombreCandidato}</div>
+      <div className="mb-2"><strong>Puesto solicitado:</strong> {puesto}</div>
+
+      {/* Tipo y detalles */}
+      {tipo && (
+        <div className="alert alert-info mt-3">
+          <strong>Tipo:</strong> {tipoInfo.label} <br />
+          <strong>Plazo:</strong> {tipoInfo.plazo} <br />
+          <strong>Costo:</strong> ${tipoInfo.precio} MXN
+        </div>
+      )}
+
       {error && <div className="alert alert-danger">{error}</div>}
+
       <div className="d-flex justify-content-between mt-4">
         <button className="btn btn-outline-secondary" onClick={onBack} disabled={loading}>
           Atrás
