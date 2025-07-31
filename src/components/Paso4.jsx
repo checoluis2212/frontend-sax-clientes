@@ -23,11 +23,13 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
       tipo: form.tipo,
       clientId: form.visitorId
     });
-    localStorage.removeItem('solicitudPendiente');
+
+    // 🔹 No borramos nada aquí para que al volver de Stripe siga pasoActual=4
     window.location.href = checkoutUrl;
   };
 
   const handleNueva = () => {
+    // 🔹 Al iniciar nueva, sí limpiamos la solicitud pendiente
     localStorage.removeItem('solicitudPendiente');
     onFinish();
   };
