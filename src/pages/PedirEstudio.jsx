@@ -33,28 +33,34 @@ export default function PedirEstudio({ visitorId }) {
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
   useEffect(() => {
-  if (!visitorId) return;
+    if (!visitorId) return;
 
-  setForm(f => ({ ...f, visitorId }));
-
-  const pendiente = localStorage.getItem('solicitudPendiente');
-  if (pendiente) {
-    const data = JSON.parse(pendiente);
-
-    // Mostrar mensaje si canceló en Stripe
     const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get('cancelado') === 'true') {
-      setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
+
+    // 🔹 Pago exitoso
+    if (urlParams.get('pagado') === 'true') {
+      localStorage.removeItem('solicitudPendiente'); // limpiar datos guardados
+      navigate('/gracias'); // ir a página de agradecimiento
+      return;
     }
 
-    // Restaurar todos los datos
-    setForm(f => ({ ...f, ...data }));
+    // 🔹 Guardar visitorId en form
+    setForm(f => ({ ...f, visitorId }));
 
-    // Forzar que arranque en el paso guardado
-    setStep(data.pasoActual || 0);
-  }
-}, [visitorId]);
+    const pendiente = localStorage.getItem('solicitudPendiente');
+    if (pendiente) {
+      const data = JSON.parse(pendiente);
 
+      // 🔹 Pago cancelado
+      if (urlParams.get('cancelado') === 'true') {
+        setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
+      }
+
+      // 🔹 Restaurar datos y paso
+      setForm(f => ({ ...f, ...data }));
+      setStep(data.pasoActual || 0);
+    }
+  }, [visitorId, location.search]);
 
   const finish = () => {
     localStorage.removeItem('solicitudPendiente');
@@ -63,6 +69,7 @@ export default function PedirEstudio({ visitorId }) {
 
   return (
     <>
+      {/* Header */}
       <header className="bg-white shadow-sm py-3 mb-4">
         <div className="container d-flex justify-content-between align-items-center">
           <img src="/sax.png" alt="SAX Services" height="130" />
@@ -70,6 +77,7 @@ export default function PedirEstudio({ visitorId }) {
         </div>
       </header>
 
+      {/* Contenido */}
       <div className="container mb-5">
         {step === 0 && <IntroEstudio onStart={() => setStep(1)} />}
         {step === 1 && (
