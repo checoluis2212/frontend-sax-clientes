@@ -28,19 +28,17 @@ export default function Paso4({ form, onBack, onFinish }) {
 
   const handleNueva = () => {
     localStorage.removeItem('solicitudPendiente');
-    onFinish(); // Esto te lleva a Intro
+    onFinish();
   };
 
   return (
     <div className="container py-5">
       <h4 className="mb-4 fw-bold">Resumen antes de pagar</h4>
 
-      <p>
-        CV enviado: <a href={form.cvUrl} target="_blank" rel="noreferrer">Ver archivo</a>
-      </p>
-      <p>Nombre candidato: {form.nombreCandidato}</p>
-      <p>Ciudad: {form.ciudad}</p>
-      <p>Puesto solicitado: {form.puesto}</p>
+      <p><strong>CV enviado:</strong> <a href={form.cvUrl} target="_blank" rel="noreferrer">Ver archivo</a></p>
+      <p><strong>Nombre candidato:</strong> {form.nombreCandidato}</p>
+      <p><strong>Ciudad:</strong> {form.ciudad}</p>
+      <p><strong>Puesto solicitado:</strong> {form.puesto}</p>
 
       <div className="alert alert-info">
         <strong>Tipo:</strong> {form.tipo || 'Estándar'}<br />
