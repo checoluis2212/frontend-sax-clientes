@@ -1,28 +1,25 @@
-// src/pages/Signup.jsx
+// src/pages/Login.jsx
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseClient';        // <- ruta corregida
 import { useNavigate, Link } from 'react-router-dom';
 
-export default function Signup() {
+export default function Login() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = async e => {
+  const handleLogin = async e => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      // crea usuario en Firebase Auth
-      await createUserWithEmailAndPassword(auth, email, password);
-      // al terminar, lleva al wizard (o donde quieras)
-      navigate('/pedir-estudio');
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/');  // va al wizard protegido
     } catch (err) {
-      // muestra el mensaje de error genérico
-      setError(err.message);
+      setError('Usuario o contraseña incorrectos');
     } finally {
       setLoading(false);
     }
@@ -30,13 +27,13 @@ export default function Signup() {
 
   return (
     <div className="container py-5" style={{ maxWidth: 400 }}>
-      <h2 className="mb-4">Crear cuenta</h2>
+      <h2 className="mb-4">Iniciar sesión</h2>
       {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleSignup}>
+      <form onSubmit={handleLogin}>
         <div className="mb-3">
-          <label htmlFor="signupEmail" className="form-label">Correo electrónico</label>
+          <label htmlFor="loginEmail" className="form-label">Correo electrónico</label>
           <input
-            id="signupEmail"
+            id="loginEmail"
             type="email"
             className="form-control"
             value={email}
@@ -46,16 +43,15 @@ export default function Signup() {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="signupPassword" className="form-label">Contraseña</label>
+          <label htmlFor="loginPassword" className="form-label">Contraseña</label>
           <input
-            id="signupPassword"
+            id="loginPassword"
             type="password"
             className="form-control"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
             disabled={loading}
-            minLength={6}
           />
         </div>
         <button
@@ -63,12 +59,12 @@ export default function Signup() {
           className="btn btn-primary w-100"
           disabled={loading}
         >
-          {loading ? 'Creando...' : 'Crear cuenta'}
+          {loading ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>
       <p className="mt-3 text-center">
-        ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+        ¿No tienes cuenta? <Link to="/signup">Regístrate</Link>
       </p>
     </div>
-  );
+);
 }
