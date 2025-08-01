@@ -1,13 +1,17 @@
 // src/components/Header.jsx
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { Link }    from 'react-router-dom';
 import logo from '../assets/sax.png'; // Ajusta el path según tu estructura
 
-const Header = () => {
+export default function Header() {
+  const { user, logout } = useAuth();
+
   return (
     <header className="bg-white shadow-sm py-3 mb-4">
       <div className="container d-flex align-items-center justify-content-between">
         {/* Logo */}
-        <a href="/" className="d-flex align-items-center text-decoration-none">
+        <Link to="/" className="d-flex align-items-center text-decoration-none">
           <img
             src={logo}
             alt="SAX México"
@@ -15,13 +19,33 @@ const Header = () => {
             height="100"
             className="me-3"
           />
-        </a>
+        </Link>
 
         {/* Tagline o subtítulo */}
         <span className="text-muted small">Estudios Socioeconómicos</span>
+
+        {/* Botones de autenticación y saludo */}
+        <div className="d-flex align-items-center">
+          {user && (
+            <span className="me-3 text-muted">
+              Hola, {user.email}
+            </span>
+          )}
+          {user ? (
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => logout()}
+            >
+              Cerrar sesión
+            </button>
+          ) : (
+            <>
+              <Link to="/login"  className="btn btn-link me-2">Ingresar</Link>
+              <Link to="/signup" className="btn btn-primary">Crear cuenta</Link>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
-};
-
-export default Header;
+}
