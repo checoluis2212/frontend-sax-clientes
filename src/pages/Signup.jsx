@@ -1,25 +1,25 @@
-// src/pages/Login.jsx
+// src/pages/Signup.jsx
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseClient';        // <- ruta corregida
 import { useNavigate, Link } from 'react-router-dom';
 
-export default function Login() {
+export default function Signup() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async e => {
+  const handleSignup = async e => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
       navigate('/');  // va al wizard protegido
     } catch (err) {
-      setError('Usuario o contraseña incorrectos');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -27,13 +27,13 @@ export default function Login() {
 
   return (
     <div className="container py-5" style={{ maxWidth: 400 }}>
-      <h2 className="mb-4">Iniciar sesión</h2>
+      <h2 className="mb-4">Crear cuenta</h2>
       {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSignup}>
         <div className="mb-3">
-          <label htmlFor="loginEmail" className="form-label">Correo electrónico</label>
+          <label htmlFor="signupEmail" className="form-label">Correo electrónico</label>
           <input
-            id="loginEmail"
+            id="signupEmail"
             type="email"
             className="form-control"
             value={email}
@@ -43,15 +43,16 @@ export default function Login() {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="loginPassword" className="form-label">Contraseña</label>
+          <label htmlFor="signupPassword" className="form-label">Contraseña</label>
           <input
-            id="loginPassword"
+            id="signupPassword"
             type="password"
             className="form-control"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
             disabled={loading}
+            minLength={6}
           />
         </div>
         <button
@@ -59,12 +60,12 @@ export default function Login() {
           className="btn btn-primary w-100"
           disabled={loading}
         >
-          {loading ? 'Ingresando...' : 'Ingresar'}
+          {loading ? 'Creando...' : 'Crear cuenta'}
         </button>
       </form>
       <p className="mt-3 text-center">
-        ¿No tienes cuenta? <Link to="/signup">Regístrate</Link>
+        ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
       </p>
     </div>
-);
+  );
 }
