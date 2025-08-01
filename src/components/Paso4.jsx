@@ -3,37 +3,68 @@ import React, { useEffect } from 'react';
 import { crearCheckout } from '../services/api';
 
 export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
+  // 1) Definimos el mismo array de opciones que en Paso3
+  const tipos = [
+    {
+      value: 'estandar',
+      label:       'Estándar ($500 MXN)',
+      amount:      500,
+      description: 'Entrega en 7 días hábiles',
+    },
+    {
+      value: 'urgente',
+      label:       'Urgente ($800 MXN)',
+      amount:      800,
+      description: 'Entrega en 3 días hábiles',
+    },
+  ];
+
+  // 2) Buscamos la opción seleccionada; si no hay, usamos 'estandar' por defecto
+  const seleccionado = tipos.find(t => t.value === form.tipo) || tipos[0];
+
+  // 3) Guardamos en localStorage los datos pendientes, incluyendo amount y description
   useEffect(() => {
     const solicitudPendiente = {
-      docId: form.docId,
-      cvUrl: form.cvUrl,
+      docId:       form.docId,
+      cvUrl:       form.cvUrl,
       nombreCandidato: form.nombreCandidato,
-      ciudad: form.ciudad,
-      puesto: form.puesto,
-      tipo: form.tipo,
-      amount: form.amount || 500,
-      pasoActual: 4
+      ciudad:      form.ciudad,
+      puesto:      form.puesto,
+      tipo:        seleccionado.value,
+      amount:      seleccionado.amount,
+      description: seleccionado.description,
+      pasoActual:  4,
     };
     localStorage.setItem('solicitudPendiente', JSON.stringify(solicitudPendiente));
-  }, [form]);
+  }, [
+    form.docId,
+    form.cvUrl,
+    form.nombreCandidato,
+    form.ciudad,
+    form.puesto,
+    seleccionado.value,
+    seleccionado.amount,
+    seleccionado.description
+  ]);
 
+  // 4) Manejador de pago
   const handleCheckout = async () => {
     const { checkoutUrl } = await crearCheckout({
-      docId: form.docId,
-      tipo: form.tipo,
-      clientId: form.visitorId
+      docId:    form.docId,
+      tipo:     seleccionado.value,
+      clientId: form.visitorId,
     });
-
-    // 🔹 No borramos nada aquí para que al volver de Stripe siga pasoActual=4
+    // Redirigimos a Stripe sin borrar localStorage, para poder retomar el paso si vuelve
     window.location.href = checkoutUrl;
   };
 
+  // 5) Reiniciar formulario
   const handleNueva = () => {
-    // 🔹 Al iniciar nueva, sí limpiamos la solicitud pendiente
     localStorage.removeItem('solicitudPendiente');
     onFinish();
   };
 
+  // 6) Renderizado del resumen
   return (
     <div className="container py-5">
       <h4 className="mb-4 fw-bold">Resumen antes de pagar</h4>
@@ -42,22 +73,40 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
         <div className="alert alert-warning">{mensajeCancelado}</div>
       )}
 
-      <p><strong>CV enviado:</strong> <a href={form.cvUrl} target="_blank" rel="noreferrer">Ver archivo</a></p>
+      <p>
+        <strong>CV enviado:</strong>{' '}
+        <a href={form.cvUrl} target="_blank" rel="noreferrer">
+          Ver archivo
+        </a>
+      </p>
       <p><strong>Nombre candidato:</strong> {form.nombreCandidato}</p>
       <p><strong>Ciudad:</strong> {form.ciudad}</p>
       <p><strong>Puesto solicitado:</strong> {form.puesto}</p>
 
       <div className="alert alert-info">
-        <strong>Tipo:</strong> {form.tipo || 'Estándar'}<br />
-        <strong>Plazo:</strong> 7 días hábiles<br />
-        <strong>Costo:</strong> ${form.amount || 500} MXN
+        <p><strong>Tipo de estudio:</strong> {seleccionado.label}</p>
+        <p><strong>Plazo:</strong> {seleccionado.description}</p>
+        <p><strong>Costo:</strong> ${seleccionado.amount} MXN</p>
       </div>
 
       <div className="d-flex justify-content-between mt-4">
-        <button className="btn btn-outline-secondary" onClick={onBack}>Atrás</button>
+        <button
+          className="btn btn-outline-secondary"
+          onClick={onBack}
+        >
+          Atrás
+        </button>
         <div>
-          <button className="btn btn-danger me-2" onClick={handleNueva}>Iniciar nueva</button>
-          <button className="btn btn-primary" onClick={handleCheckout}>
+          <button
+            className="btn btn-danger me-2"
+            onClick={handleNueva}
+          >
+            Iniciar nueva
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={handleCheckout}
+          >
             {mensajeCancelado ? 'Reintentar pago' : 'Ir a pagar'}
           </button>
         </div>
