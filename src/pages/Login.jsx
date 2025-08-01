@@ -1,7 +1,7 @@
 // src/pages/Login.jsx
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth } from '../firebaseClient';        // <- ruta corregida
 import { useNavigate, Link } from 'react-router-dom';
 
 export default function Login() {
@@ -66,5 +66,5 @@ export default function Login() {
         ¿No tienes cuenta? <Link to="/signup">Regístrate</Link>
       </p>
     </div>
-  );
+);
 }
