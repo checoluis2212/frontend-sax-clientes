@@ -77,7 +77,7 @@ export default function PedirEstudio({ visitorId }) {
     localStorage.removeItem('solicitudPendiente');
     setForm({ ...initialForm, visitorId });  // mantén visitorId
     setMensajeCancelado('');
-    setStep(1);                               // vuelve al paso 1
+    setStep(0);                               // vuelve al paso 0 (IntroEstudio)
   }, [visitorId]);
 
   return (
@@ -133,6 +133,8 @@ export default function PedirEstudio({ visitorId }) {
             form={form}
             mensajeCancelado={mensajeCancelado}
             onBack={() => setStep(3)}
+            onFinish={finish}
+            onReset={reset}
           />
         )}
       </div>
