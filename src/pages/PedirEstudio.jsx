@@ -133,8 +133,6 @@ export default function PedirEstudio({ visitorId }) {
             form={form}
             mensajeCancelado={mensajeCancelado}
             onBack={() => setStep(3)}
-            onFinish={finish}  // botón “Ir a pagar” o pago exitoso
-            onReset={reset}    // botón “Iniciar nueva”
           />
         )}
       </div>
