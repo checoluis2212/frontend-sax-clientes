@@ -1,9 +1,12 @@
 // src/components/Paso4.jsx
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { crearCheckout } from '../services/api';
 
-export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
-  // 1) Definimos el mismo array de opciones que en Paso3
+export default function Paso4({ form, mensajeCancelado, onBack }) {
+  const navigate = useNavigate();
+
+  // 1) Mismo array de opciones que en Paso3
   const tipos = [
     {
       value: 'estandar',
@@ -19,10 +22,10 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
     },
   ];
 
-  // 2) Buscamos la opción seleccionada; si no hay, usamos 'estandar' por defecto
+  // 2) Obtenemos la opción seleccionada (o caemos en estandar)
   const seleccionado = tipos.find(t => t.value === form.tipo) || tipos[0];
 
-  // 3) Guardamos en localStorage los datos pendientes, incluyendo amount y description
+  // 3) Guardamos en localStorage, incluyendo amount y description
   useEffect(() => {
     const solicitudPendiente = {
       docId:       form.docId,
@@ -47,24 +50,25 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
     seleccionado.description
   ]);
 
-  // 4) Manejador de pago
+  // 4) Enviar a Stripe
   const handleCheckout = async () => {
     const { checkoutUrl } = await crearCheckout({
       docId:    form.docId,
       tipo:     seleccionado.value,
       clientId: form.visitorId,
     });
-    // Redirigimos a Stripe sin borrar localStorage, para poder retomar el paso si vuelve
     window.location.href = checkoutUrl;
   };
 
-  // 5) Reiniciar formulario
+  // 5) Reiniciar el wizard y volver al paso 1
   const handleNueva = () => {
+    // Limpiamos el localStorage
     localStorage.removeItem('solicitudPendiente');
-    onFinish();
+    // Navegamos al inicio de PedirEstudio, reemplazando la URL actual
+    navigate('/pedir-estudio', { replace: true });
   };
 
-  // 6) Renderizado del resumen
+  // 6) Renderizado
   return (
     <div className="container py-5">
       <h4 className="mb-4 fw-bold">Resumen antes de pagar</h4>
@@ -75,9 +79,7 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
 
       <p>
         <strong>CV enviado:</strong>{' '}
-        <a href={form.cvUrl} target="_blank" rel="noreferrer">
-          Ver archivo
-        </a>
+        <a href={form.cvUrl} target="_blank" rel="noreferrer">Ver archivo</a>
       </p>
       <p><strong>Nombre candidato:</strong> {form.nombreCandidato}</p>
       <p><strong>Ciudad:</strong> {form.ciudad}</p>
