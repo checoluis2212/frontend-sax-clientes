@@ -1,12 +1,8 @@
 // src/components/Paso4.jsx
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { crearCheckout } from '../services/api';
 
-export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
-  const navigate = useNavigate();
-
-  // Array idéntico al de Paso3
+export default function Paso4({ form, mensajeCancelado, onBack, onReset, crearCheckout }) {
+  // 1) Mismo array de tipos que Paso3
   const tipos = [
     {
       value: 'estandar',
@@ -21,9 +17,11 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
       description: 'Entrega en 3 días hábiles',
     },
   ];
+
+  // 2) Selección de la opción
   const seleccionado = tipos.find(t => t.value === form.tipo) || tipos[0];
 
-  // Guardar estado pendiente tal cual lo tenías
+  // 3) Guardar estado pendiente con amount y description
   useEffect(() => {
     const solicitudPendiente = {
       docId:       form.docId,
@@ -48,7 +46,7 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
     seleccionado.description
   ]);
 
-  // Maneja el checkout (igual que antes)
+  // 4) Manejador de pago (se provee creación de checkout como prop)
   const handleCheckout = async () => {
     const { checkoutUrl } = await crearCheckout({
       docId:    form.docId,
@@ -58,12 +56,10 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
     window.location.href = checkoutUrl;
   };
 
-  // ESTE es el único cambio: lleva al usuario al index (/) sin romper tu lógica
+  // 5) Botón “Iniciar nueva vacante”
   const handleNuevaVacante = () => {
-    // opcional: limpia el storage
     localStorage.removeItem('solicitudPendiente');
-    // redirige al home de vacantes
-    navigate('/', { replace: true });
+    onReset();  // vuelve al paso 0 en el wizard sin tocar rutas
   };
 
   return (
@@ -76,7 +72,9 @@ export default function Paso4({ form, mensajeCancelado, onBack, onFinish }) {
 
       <p>
         <strong>CV enviado:</strong>{' '}
-        <a href={form.cvUrl} target="_blank" rel="noreferrer">Ver archivo</a>
+        <a href={form.cvUrl} target="_blank" rel="noreferrer">
+          Ver archivo
+        </a>
       </p>
       <p><strong>Nombre candidato:</strong> {form.nombreCandidato}</p>
       <p><strong>Ciudad:</strong> {form.ciudad}</p>
