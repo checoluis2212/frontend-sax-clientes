@@ -6,7 +6,7 @@ import { crearCheckout } from '../services/api';
 export default function Paso4({ form, mensajeCancelado, onBack }) {
   const navigate = useNavigate();
 
-  // 1) Mismo array de opciones que en Paso3
+  // 1) Definición idéntica de tipos a Paso3
   const tipos = [
     {
       value: 'estandar',
@@ -22,10 +22,10 @@ export default function Paso4({ form, mensajeCancelado, onBack }) {
     },
   ];
 
-  // 2) Obtenemos la opción seleccionada (o caemos en estandar)
+  // 2) Selección de la opción actual (fall back a estandar)
   const seleccionado = tipos.find(t => t.value === form.tipo) || tipos[0];
 
-  // 3) Guardamos en localStorage, incluyendo amount y description
+  // 3) Guardamos en localStorage (con amount y description)
   useEffect(() => {
     const solicitudPendiente = {
       docId:       form.docId,
@@ -50,7 +50,7 @@ export default function Paso4({ form, mensajeCancelado, onBack }) {
     seleccionado.description
   ]);
 
-  // 4) Enviar a Stripe
+  // 4) Enviar al checkout de Stripe
   const handleCheckout = async () => {
     const { checkoutUrl } = await crearCheckout({
       docId:    form.docId,
@@ -60,15 +60,14 @@ export default function Paso4({ form, mensajeCancelado, onBack }) {
     window.location.href = checkoutUrl;
   };
 
-  // 5) Reiniciar el wizard y volver al paso 1
+  // 5) Nuevo comportamiento: reiniciar el wizard
   const handleNueva = () => {
-    // Limpiamos el localStorage
+    // Limpia la solicitud pendiente
     localStorage.removeItem('solicitudPendiente');
-    // Navegamos al inicio de PedirEstudio, reemplazando la URL actual
+    // Navega al inicio del flujo, reemplazando la URL actual
     navigate('/pedir-estudio', { replace: true });
   };
 
-  // 6) Renderizado
   return (
     <div className="container py-5">
       <h4 className="mb-4 fw-bold">Resumen antes de pagar</h4>
