@@ -1,12 +1,9 @@
 // src/components/Paso4.jsx
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { crearCheckout } from '../services/api';
 
-export default function Paso4({ form, mensajeCancelado, onBack }) {
-  const navigate = useNavigate();
-
-  // 1) Definición idéntica de tipos a Paso3
+export default function Paso4({ form, mensajeCancelado, onBack, onReset }) {
+  // 1) El array de tipos, igual que en Paso3
   const tipos = [
     {
       value: 'estandar',
@@ -22,10 +19,10 @@ export default function Paso4({ form, mensajeCancelado, onBack }) {
     },
   ];
 
-  // 2) Selección de la opción actual (fall back a estandar)
+  // 2) Seleccionamos la opción actual (o estandar por defecto)
   const seleccionado = tipos.find(t => t.value === form.tipo) || tipos[0];
 
-  // 3) Guardamos en localStorage (con amount y description)
+  // 3) Guardamos en localStorage el estado pendiente
   useEffect(() => {
     const solicitudPendiente = {
       docId:       form.docId,
@@ -50,7 +47,7 @@ export default function Paso4({ form, mensajeCancelado, onBack }) {
     seleccionado.description
   ]);
 
-  // 4) Enviar al checkout de Stripe
+  // 4) Enviar a Stripe
   const handleCheckout = async () => {
     const { checkoutUrl } = await crearCheckout({
       docId:    form.docId,
@@ -60,12 +57,10 @@ export default function Paso4({ form, mensajeCancelado, onBack }) {
     window.location.href = checkoutUrl;
   };
 
-  // 5) Nuevo comportamiento: reiniciar el wizard
+  // 5) Aquí llamamos a onReset para volver al paso 0
   const handleNueva = () => {
-    // Limpia la solicitud pendiente
     localStorage.removeItem('solicitudPendiente');
-    // Navega al inicio del flujo, reemplazando la URL actual
-    navigate('/pedir-estudio', { replace: true });
+    onReset();
   };
 
   return (
