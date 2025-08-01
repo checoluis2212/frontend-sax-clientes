@@ -15,23 +15,25 @@ export default function IntroEstudio({ onStart }) {
           <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
 
           {/* Botones de Login/Signup o Logout */}
-          <div>
-            {user
-              ? (
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={() => logout()}
-                >
-                  Cerrar sesión
-                </button>
-              )
-              : (
-                <>
-                  <Link to="/login"  className="btn btn-link">Ingresar</Link>
-                  <Link to="/signup" className="btn btn-primary ms-2">Crear cuenta</Link>
-                </>
-              )
-            }
+          <div className="d-flex align-items-center">
+            {user && (
+              <span className="me-3 text-muted">
+                Hola, {user.email}
+              </span>
+            )}
+            {user ? (
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => logout()}
+              >
+                Cerrar sesión
+              </button>
+            ) : (
+              <>
+                <Link to="/login"  className="btn btn-link">Ingresar</Link>
+                <Link to="/signup" className="btn btn-primary ms-2">Crear cuenta</Link>
+              </>
+            )}
           </div>
         </div>
       </header>
