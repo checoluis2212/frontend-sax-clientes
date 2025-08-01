@@ -1,19 +1,21 @@
 // src/middleware/auth.js
-const { admin } = require('../firebase');
+const { admin } = require('../firebase');  // ajusta si tu firebase.js está en otra carpeta
 
 module.exports = async function authMiddleware(req, res, next) {
-  const header = req.headers.authorization || '';
-  const match  = header.match(/^Bearer (.+)$/);
+  const authHeader = req.headers.authorization || '';
+  const match = authHeader.match(/^Bearer (.+)$/);
   if (!match) {
     return res.status(401).json({ ok: false, error: 'No token provided' });
   }
+
+  const idToken = match[1];
   try {
-    const decoded = await admin.auth().verifyIdToken(match[1]);
+    const decoded = await admin.auth().verifyIdToken(idToken);
     req.uid   = decoded.uid;
     req.email = decoded.email;
     next();
   } catch (err) {
-    console.error('Auth error:', err);
+    console.error('❌ Auth error:', err);
     res.status(401).json({ ok: false, error: 'Invalid or expired token' });
   }
 };
