@@ -13,7 +13,7 @@ export default function IntroEstudio() {
       <header className="bg-white shadow-sm py-3 mb-4">
         <div className="container d-flex justify-content-between align-items-center">
           <img src="/sax.png" alt="SAX Services" height="130" />
-          <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
+  
 
           {/* Botones de Login/Signup o Logout */}
           <div className="d-flex align-items-center">
@@ -100,3 +100,4 @@ export default function IntroEstudio() {
     </div>
   );
 }
+
