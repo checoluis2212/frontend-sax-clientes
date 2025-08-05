@@ -10,6 +10,7 @@ import Signup             from './pages/Signup';
 import Login              from './pages/Login';
 import PedirEstudio       from './pages/PedirEstudio';
 import Gracias            from './pages/Gracias';
+import IntroEstudio       from './components/IntroEstudio'; // 🔹 Asegúrate de tener este componente
 
 function App() {
   const [visitorId, setVisitorId]     = useState(null);
@@ -38,13 +39,16 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Rutas públicas de autenticación */}
+          {/* 🔹 Home público */}
+          <Route path="/" element={<IntroEstudio />} />
+
+          {/* 🔹 Autenticación */}
           <Route path="/signup" element={<Signup />} />
           <Route path="/login"  element={<Login />}  />
 
-          {/* Tu wizard y la pantalla de gracias quedan **exactamente** igual, solo protegidas */}
+          {/* 🔹 Wizard protegido */}
           <Route
-            path="/"
+            path="/wizard"
             element={
               <ProtectedRoute>
                 <PedirEstudio
@@ -55,6 +59,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* 🔹 Gracias protegido */}
           <Route
             path="/gracias"
             element={
