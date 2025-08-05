@@ -1,10 +1,11 @@
 // src/components/IntroEstudio.jsx
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Link }    from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function IntroEstudio({ onStart }) {
+export default function IntroEstudio() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -38,7 +39,7 @@ export default function IntroEstudio({ onStart }) {
         </div>
       </header>
 
-      {/* Contenido de la Intro */}
+      {/* Contenido principal */}
       <div className="container text-center py-5">
         <h1 className="display-5 fw-bold">
           Solicita un estudio socioeconómico al instante
@@ -48,8 +49,8 @@ export default function IntroEstudio({ onStart }) {
         </p>
         <button
           className="btn btn-primary btn-lg"
-          onClick={onStart}
-          disabled={!user} // opcional: solo permitir avanzar si está logueado
+          onClick={() => navigate('/wizard')}
+          disabled={!user} // opcional: solo permitir si está logueado
         >
           {user ? 'Empezar ahora' : 'Por favor ingresa'}
         </button>
