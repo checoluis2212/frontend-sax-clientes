@@ -47,26 +47,4 @@ export default function IntroEstudio() {
           </div>
         </div>
 
-        {/* Botones de acción */}
-        {user ? (
-          <button
-            className="btn btn-primary btn-lg shadow-sm"
-            onClick={() => navigate('/wizard?step=1')}
-          >
-            Empezar ahora
-          </button>
-        ) : (
-          <div>
-            <p className="text-muted">Inicia sesión o regístrate para comenzar</p>
-            <Link to="/login" className="btn btn-primary me-2 shadow-sm">
-              Ingresar
-            </Link>
-            <Link to="/signup" className="btn btn-outline-secondary shadow-sm">
-              Crear cuenta
-            </Link>
-          </div>
-        )}
-      </div>
-    </>
-  );
-}
+        
