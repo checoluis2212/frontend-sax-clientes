@@ -1,9 +1,8 @@
-// src/components/IntroEstudio.jsx
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import Header from './Header'; // Header global
-import './IntroEstudio.css';
+import Header from './Header';
+import './IntroEstudio.css'; // Estilos para íconos y layout
 
 export default function IntroEstudio() {
   const { user } = useAuth();
@@ -11,12 +10,12 @@ export default function IntroEstudio() {
 
   return (
     <>
-      {/* 🔹 Header en la parte superior */}
+      {/* Header persistente */}
       <Header />
 
       <div className="container text-center py-5">
-        {/* Título principal */}
-        <h1 className="display-5 fw-bold mb-4">
+        {/* Título */}
+        <h1 className="display-5 fw-bold mb-3">
           Solicita un estudio socioeconómico al instante
         </h1>
         <p className="lead mb-5 text-muted">
@@ -48,7 +47,7 @@ export default function IntroEstudio() {
           </div>
         </div>
 
-        {/* Botón de acción */}
+        {/* Botones de acción */}
         {user ? (
           <button
             className="btn btn-primary btn-lg shadow-sm"
