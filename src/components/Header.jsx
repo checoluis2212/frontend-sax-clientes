@@ -1,7 +1,6 @@
-// src/components/Header.jsx
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Link }    from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '../assets/sax.png'; // Ajusta el path según tu estructura
 
 export default function Header() {
@@ -21,9 +20,6 @@ export default function Header() {
           />
         </Link>
 
-        {/* Tagline o subtítulo */}
-        <span className="text-muted small">Estudios Socioeconómicos</span>
-
         {/* Botones de autenticación y saludo */}
         <div className="d-flex align-items-center">
           {user && (
@@ -40,7 +36,7 @@ export default function Header() {
             </button>
           ) : (
             <>
-              <Link to="/login"  className="btn btn-link me-2">Ingresar</Link>
+              <Link to="/login" className="btn btn-link me-2">Ingresar</Link>
               <Link to="/signup" className="btn btn-primary">Crear cuenta</Link>
             </>
           )}
