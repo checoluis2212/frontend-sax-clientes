@@ -1,8 +1,8 @@
-// src/pages/PedirEstudio.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+import Header from '../components/Header';
 import IntroEstudio from '../components/IntroEstudio';
 import Paso1 from '../components/Paso1';
 import Paso2 from '../components/Paso2';
@@ -36,29 +36,24 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
   const [form, setForm] = useState({ ...defaultForm, ...initialForm, visitorId });
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
-  // 🔒 Redirigir a login si no está logueado
   useEffect(() => {
     if (step > 0 && !user) {
       navigate('/login');
     }
   }, [step, user, navigate]);
 
-  // 🔄 Forzar step desde query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const urlStep = parseInt(params.get('step'), 10);
-
     if (!isNaN(urlStep) && urlStep !== step) {
       setStep(urlStep);
     }
   }, [location.search, step]);
 
-  // 🔁 Restaurar desde Stripe o localStorage
   useEffect(() => {
     if (!visitorId) return;
 
     const params = new URLSearchParams(location.search);
-
     if (params.get('pagado') === 'true') {
       localStorage.removeItem('solicitudPendiente');
       navigate('/gracias');
@@ -91,12 +86,8 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
 
   return (
     <>
-      <header className="bg-white shadow-sm py-3 mb-4">
-        <div className="container d-flex justify-content-between align-items-center">
-          <img src="/sax.png" alt="SAX Services" height="130" />
-          <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
-        </div>
-      </header>
+      {/* Header común para todos los pasos */}
+      <Header />
 
       <div className="container mb-5">
         {step === 0 && (
