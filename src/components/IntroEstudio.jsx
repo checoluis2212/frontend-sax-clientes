@@ -3,57 +3,43 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function IntroEstudio() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   return (
-    <div>
-      {/* Header */}
-      <header className="bg-white shadow-sm py-3 mb-4">
-        <div className="container d-flex justify-content-between align-items-center">
-          <img src="/sax.png" alt="SAX Services" height="130" />
-          <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
+    <div className="container text-center py-5">
+      <h1 className="display-5 fw-bold mb-4">
+        Solicita un estudio socioeconómico al instante
+      </h1>
+      <p className="lead mb-5">
+        Estándar $500 MXN | Urgente $800 MXN
+      </p>
 
-          {/* Botones de Login/Signup o Logout */}
-          <div className="d-flex align-items-center">
-            {user && (
-              <span className="me-3 text-muted">
-                Hola, {user.email}
-              </span>
-            )}
-            {user ? (
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => logout()}
-              >
-                Cerrar sesión
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn-link">Ingresar</Link>
-                <Link to="/signup" className="btn btn-primary ms-2">Crear cuenta</Link>
-              </>
-            )}
-          </div>
+      <div className="row mb-5">
+        <div className="col-md-4">
+          <img src="/icons/register.svg" alt="Registro" height="80" className="mb-3" />
+          <h5>Regístrate</h5>
+          <p className="text-muted">Crea tu cuenta en segundos para comenzar.</p>
         </div>
-      </header>
-
-      {/* Contenido de la Intro */}
-      <div className="container text-center py-5">
-        <h1 className="display-5 fw-bold">
-          Solicita un estudio socioeconómico al instante
-        </h1>
-        <p className="lead">
-          Estándar $500 MXN | Urgente $800 MXN
-        </p>
-        <button
-          className="btn btn-primary btn-lg"
-          onClick={() => navigate('/wizard?step=1')}
-          disabled={!user}
-        >
-          {user ? 'Empezar ahora' : 'Por favor ingresa'}
-        </button>
+        <div className="col-md-4">
+          <img src="/icons/data.svg" alt="Datos" height="80" className="mb-3" />
+          <h5>Proporciona los datos</h5>
+          <p className="text-muted">Completa la información del candidato y adjunta CV.</p>
+        </div>
+        <div className="col-md-4">
+          <img src="/icons/payment.svg" alt="Pago" height="80" className="mb-3" />
+          <h5>Realiza el pago</h5>
+          <p className="text-muted">Paga en línea de manera segura con Stripe.</p>
+        </div>
       </div>
+
+      <button
+        className="btn btn-primary btn-lg"
+        onClick={() => navigate('/wizard?step=1')}
+        disabled={!user}
+      >
+        {user ? 'Empezar ahora' : 'Por favor ingresa'}
+      </button>
     </div>
   );
 }
