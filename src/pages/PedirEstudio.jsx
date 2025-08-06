@@ -32,7 +32,11 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
   const location = useLocation();
   const { user } = useAuth();
 
-  const [step, setStep] = useState(initialStep || 0);
+  // 🔹 Leer step desde URL si está presente
+  const params = new URLSearchParams(location.search);
+  const stepFromUrl = parseInt(params.get('step'), 10);
+
+  const [step, setStep] = useState(!isNaN(stepFromUrl) ? stepFromUrl : (initialStep || 0));
   const [form, setForm] = useState({ ...defaultForm, ...initialForm, visitorId });
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
@@ -43,11 +47,16 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
     }
   }, [step, user, navigate]);
 
+  // 🔁 Forzar paso 1 si hay usuario logueado y estamos en 0
+  useEffect(() => {
+    if (user && step === 0) {
+      setStep(1);
+    }
+  }, [user, step]);
+
   // 🔁 Stripe y restaurar desde localStorage si no vino de App
   useEffect(() => {
     if (!visitorId) return;
-
-    const params = new URLSearchParams(location.search);
 
     if (params.get('pagado') === 'true') {
       localStorage.removeItem('solicitudPendiente');
@@ -55,20 +64,18 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
       return;
     }
 
-    // Cancelado desde Stripe
     if (params.get('cancelado') === 'true') {
       setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
     }
 
-    // Si no vino `initialForm`, intenta cargarlo desde localStorage
     const local = localStorage.getItem('solicitudPendiente');
     if (local && !initialForm?.nombreCandidato) {
       const data = JSON.parse(local);
       setForm(f => ({ ...f, ...data }));
-      setStep(data.pasoActual || 0);
+      setStep(data.pasoActual || step);
     }
 
-  }, [visitorId, location.search, navigate, initialForm]);
+  }, [visitorId, location.search, navigate, initialForm, params, step]);
 
   const finish = useCallback(() => {
     localStorage.removeItem('solicitudPendiente');
