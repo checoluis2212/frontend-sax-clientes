@@ -1,31 +1,31 @@
-// src/pages/Login.jsx
+// src/pages/Signup.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseClient';
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/wizard'); // 🔹 Redirigir al Wizard después de login
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate('/wizard?step=1'); // 🔹 Ir directo al Paso 1
     } catch (err) {
       console.error(err);
-      setError('Error al iniciar sesión. Verifica tus datos.');
+      setError('Error al registrarse. Verifica tus datos.');
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: 400 }}>
-      <h2 className="mb-4">Iniciar sesión</h2>
+      <h2 className="mb-4">Crear cuenta</h2>
       {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSignup}>
         <div className="mb-3">
           <label>Email</label>
           <input
@@ -47,11 +47,11 @@ export default function Login() {
           />
         </div>
         <button className="btn btn-primary w-100" type="submit">
-          Iniciar sesión
+          Registrarse
         </button>
       </form>
       <p className="mt-3 text-center">
-        ¿No tienes cuenta? <Link to="/signup">Regístrate</Link>
+        ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
       </p>
     </div>
   );
