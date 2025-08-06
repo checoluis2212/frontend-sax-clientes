@@ -1,3 +1,4 @@
+// src/pages/PedirEstudio.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -35,53 +36,52 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
   const [form, setForm] = useState({ ...defaultForm, ...initialForm, visitorId });
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
-  // 🔒 Proteger pasos si no hay login
+  // 🔒 Redirigir a login si no está logueado
   useEffect(() => {
     if (step > 0 && !user) {
       navigate('/login');
     }
   }, [step, user, navigate]);
 
-  // 🔁 Restaurar paso desde URL/localStorage/Stripe
+  // 🔄 Forzar step desde query params
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const urlStep = parseInt(params.get('step'), 10);
+
+    if (!isNaN(urlStep) && urlStep !== step) {
+      setStep(urlStep);
+    }
+  }, [location.search, step]);
+
+  // 🔁 Restaurar desde Stripe o localStorage
   useEffect(() => {
     if (!visitorId) return;
 
     const params = new URLSearchParams(location.search);
 
-    // 🔹 Forzar paso desde query (?step=1)
-    const urlStep = parseInt(params.get('step'), 10);
-    if (!isNaN(urlStep)) {
-      setStep(urlStep);
-    }
-
-    // 🔹 Pago completado
     if (params.get('pagado') === 'true') {
       localStorage.removeItem('solicitudPendiente');
       navigate('/gracias');
       return;
     }
 
-    // 🔹 Pago cancelado
     if (params.get('cancelado') === 'true') {
       setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
     }
 
-    // 🔹 Restaurar solicitud pendiente
-    const pendiente = localStorage.getItem('solicitudPendiente');
-    if (pendiente && !initialForm?.nombreCandidato) {
-      const data = JSON.parse(pendiente);
+    const local = localStorage.getItem('solicitudPendiente');
+    if (local && !initialForm?.nombreCandidato) {
+      const data = JSON.parse(local);
       setForm(f => ({ ...f, ...data }));
       setStep(data.pasoActual || 0);
     }
   }, [visitorId, location.search, navigate, initialForm]);
 
-  // 🔹 Finalizar flujo
   const finish = useCallback(() => {
     localStorage.removeItem('solicitudPendiente');
     navigate('/gracias');
   }, [navigate]);
 
-  // 🔹 Reiniciar flujo
   const reset = useCallback(() => {
     localStorage.removeItem('solicitudPendiente');
     setForm({ ...defaultForm, visitorId });
@@ -100,7 +100,7 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
 
       <div className="container mb-5">
         {step === 0 && (
-          <IntroEstudio onStart={() => navigate('/wizard?step=1')} />
+          <IntroEstudio onStart={() => setStep(1)} />
         )}
         {step === 1 && (
           <Paso1
