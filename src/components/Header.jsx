@@ -1,8 +1,7 @@
-// src/components/Header.jsx
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import logo from '../assets/sax.png'; // Asegúrate que exista
+import logo from '../assets/sax.png';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -10,6 +9,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm py-3 mb-4">
       <div className="container d-flex align-items-center justify-content-between">
+        {/* Logo */}
         <Link to="/" className="d-flex align-items-center text-decoration-none">
           <img
             src={logo}
@@ -20,6 +20,7 @@ export default function Header() {
           />
         </Link>
 
+        {/* Botones */}
         <div className="d-flex align-items-center">
           {user && (
             <span className="me-3 text-muted">
@@ -27,7 +28,10 @@ export default function Header() {
             </span>
           )}
           {user ? (
-            <button className="btn btn-outline-secondary" onClick={logout}>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => logout()}
+            >
               Cerrar sesión
             </button>
           ) : (
