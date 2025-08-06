@@ -1,8 +1,9 @@
+// src/pages/PedirEstudio.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-import Header from '../components/Header';
+import Header from '../components/Header'; // 🔹 Header global
 import IntroEstudio from '../components/IntroEstudio';
 import Paso1 from '../components/Paso1';
 import Paso2 from '../components/Paso2';
@@ -86,13 +87,11 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
 
   return (
     <>
-      {/* Header común para todos los pasos */}
+      {/* 🔹 Header fijo en todos los pasos */}
       <Header />
 
       <div className="container mb-5">
-        {step === 0 && (
-          <IntroEstudio onStart={() => setStep(1)} />
-        )}
+        {step === 0 && <IntroEstudio onStart={() => setStep(1)} />}
         {step === 1 && (
           <Paso1
             form={form}
@@ -106,22 +105,8 @@ export default function PedirEstudio({ visitorId, initialForm = {}, initialStep 
             }}
           />
         )}
-        {step === 2 && (
-          <Paso2
-            form={form}
-            setForm={setForm}
-            onBack={() => setStep(1)}
-            onNext={() => setStep(3)}
-          />
-        )}
-        {step === 3 && (
-          <Paso3
-            form={form}
-            setForm={setForm}
-            onBack={() => setStep(2)}
-            onNext={() => setStep(4)}
-          />
-        )}
+        {step === 2 && <Paso2 form={form} setForm={setForm} onBack={() => setStep(1)} onNext={() => setStep(3)} />}
+        {step === 3 && <Paso3 form={form} setForm={setForm} onBack={() => setStep(2)} onNext={() => setStep(4)} />}
         {step === 4 && (
           <Paso4
             form={form}
