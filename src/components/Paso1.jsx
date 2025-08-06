@@ -10,10 +10,11 @@ export default function Paso1({ form, setForm, onNext }) {
   })
   const [errors, setErrors] = useState({})
 
-  // Reglas de validación
+  // 🔍 Reglas de validación
   const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
   const isTel10 = (s) => /^[0-9]{10}$/.test(s)
 
+  // 🛠 Validaciones dinámicas
   useEffect(() => {
     const e = {}
     if (touched.nombre && form.nombre.trim() === '') e.nombre = 'Requerido'
@@ -33,6 +34,16 @@ export default function Paso1({ form, setForm, onNext }) {
 
   const handleBlur = (field) =>
     setTouched((t) => ({ ...t, [field]: true }))
+
+  // 🔄 Avanzar al siguiente paso garantizando que el form esté actualizado
+  const handleNext = () => {
+    const updatedForm = {
+      ...form,
+      nombreSolicitante: `${form.nombre.trim()} ${form.apellido.trim()}`
+    }
+    setForm(updatedForm)
+    onNext(updatedForm) // pasamos el form actualizado
+  }
 
   return (
     <div className="container py-5">
@@ -81,20 +92,13 @@ export default function Paso1({ form, setForm, onNext }) {
       </div>
 
       <div className="mt-4">
-       <button
-         className="btn btn-primary"
-        onClick={() => {
-          setForm(f => ({
-             ...f,
-             nombreSolicitante: `${f.nombre.trim()} ${f.apellido.trim()}`
-           }))
-          onNext()
-        }}
-        disabled={!canNext}
->
-  Siguiente
-</button>
-
+        <button
+          className="btn btn-primary"
+          onClick={handleNext}
+          disabled={!canNext}
+        >
+          Siguiente
+        </button>
       </div>
     </div>
   )
