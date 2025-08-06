@@ -1,1 +1,23 @@
+.icon-step {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.2s ease-in-out;
+}
+
+.icon-step:hover {
+  transform: scale(1.05);
+}
+
+h5.fw-semibold {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+p.text-muted.small {
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
 
