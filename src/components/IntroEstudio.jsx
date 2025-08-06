@@ -1,4 +1,3 @@
-// src/components/IntroEstudio.jsx
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
@@ -18,17 +17,17 @@ export default function IntroEstudio() {
 
       <div className="row mb-5">
         <div className="col-md-4 mb-4">
-          <img src="/icons/register.svg" alt="Registro" height="80" className="mb-3" />
+          <img src="/register.svg" alt="Registro" height="80" className="mb-3" />
           <h5 className="fw-semibold">Regístrate</h5>
           <p className="text-muted small">Crea tu cuenta en segundos para comenzar.</p>
         </div>
         <div className="col-md-4 mb-4">
-          <img src="/icons/data.svg" alt="Datos" height="80" className="mb-3" />
+          <img src="/data.svg" alt="Datos" height="80" className="mb-3" />
           <h5 className="fw-semibold">Proporciona los datos</h5>
           <p className="text-muted small">Completa la información del candidato y adjunta CV.</p>
         </div>
         <div className="col-md-4 mb-4">
-          <img src="/icons/payment.svg" alt="Pago" height="80" className="mb-3" />
+          <img src="/payment.svg" alt="Pago" height="80" className="mb-3" />
           <h5 className="fw-semibold">Realiza el pago</h5>
           <p className="text-muted small">Paga en línea de manera segura con Stripe.</p>
         </div>
