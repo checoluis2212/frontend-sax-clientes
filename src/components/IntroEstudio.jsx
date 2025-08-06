@@ -1,14 +1,9 @@
 // src/components/IntroEstudio.jsx
 import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
 import Header from './Header';
 import './IntroEstudio.css'; // Estilos para íconos y layout
 
 export default function IntroEstudio() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
   return (
     <>
       {/* Header persistente */}
@@ -47,25 +42,6 @@ export default function IntroEstudio() {
             </p>
           </div>
         </div>
-
-        {/* Botón de acción */}
-        {user ? (
-          <button
-            className="btn btn-primary btn-lg shadow-sm"
-            onClick={() => navigate('/wizard?step=1')}
-          >
-            Empezar ahora
-          </button>
-        ) : (
-          <div className="d-flex justify-content-center gap-2">
-            <Link to="/login" className="btn btn-primary shadow-sm">
-              Ingresar
-            </Link>
-            <Link to="/signup" className="btn btn-outline-secondary shadow-sm">
-              Crear cuenta
-            </Link>
-          </div>
-        )}
       </div>
     </>
   );
