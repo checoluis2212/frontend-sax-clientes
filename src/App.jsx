@@ -1,78 +1,140 @@
-// src/App.jsx
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
+// src/pages/PedirEstudio.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-import { AuthProvider }   from './contexts/AuthContext';
-import ProtectedRoute     from './components/ProtectedRoute';
+import IntroEstudio from '../components/IntroEstudio';
+import Paso1 from '../components/Paso1';
+import Paso2 from '../components/Paso2';
+import Paso3 from '../components/Paso3';
+import Paso4 from '../components/Paso4';
 
-import Signup             from './pages/Signup';
-import Login              from './pages/Login';
-import PedirEstudio       from './pages/PedirEstudio';
-import Gracias            from './pages/Gracias';
-import IntroEstudio       from './components/IntroEstudio'; // 🔹 Asegúrate de tener este componente
+const initialFormDefault = {
+  nombre: '',
+  apellido: '',
+  empresa: '',
+  telefono: '',
+  email: '',
+  nombreSolicitante: '',
+  nombreCandidato: '',
+  ciudad: '',
+  puesto: '',
+  cv: null,
+  docId: '',
+  cvUrl: '',
+  tipo: '',
+  amount: '',
+  visitorId: ''
+};
 
-function App() {
-  const [visitorId, setVisitorId]     = useState(null);
-  const [initialForm, setInitialForm] = useState({});
-  const [initialStep, setInitialStep] = useState(1);
+export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
 
+  const [step, setStep] = useState(initialStep || 0);
+  const [form, setForm] = useState({ ...initialFormDefault, ...initialForm });
+  const [mensajeCancelado, setMensajeCancelado] = useState('');
+
+  // 🔹 Verificar login cuando estamos en pasos > 0
   useEffect(() => {
-    const initFingerprint = async () => {
-      const fp = await FingerprintJS.load();
-      const { visitorId } = await fp.get();
-      setVisitorId(visitorId);
+    if (step > 0 && !user) {
+      navigate('/login');
+    }
+  }, [step, user, navigate]);
 
-      const pendiente = localStorage.getItem('solicitudPendiente');
-      if (pendiente) {
-        const data = JSON.parse(pendiente);
-        setInitialForm(data);
-        setInitialStep(data.pasoActual || 1);
-      }
-    };
-    initFingerprint();
-  }, []);
+  // 🔹 Restaurar desde Stripe y URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
 
-  if (!visitorId) return <div>Cargando…</div>;
+    if (!visitorId) return;
+
+    // Pago exitoso
+    if (params.get('pagado') === 'true') {
+      localStorage.removeItem('solicitudPendiente');
+      navigate('/gracias');
+      return;
+    }
+
+    // Guardar visitorId
+    setForm(f => ({ ...f, visitorId }));
+
+    // Pago cancelado
+    if (params.get('cancelado') === 'true') {
+      setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
+    }
+  }, [visitorId, location.search, navigate]);
+
+  // 🔹 Terminar flujo
+  const finish = useCallback(() => {
+    localStorage.removeItem('solicitudPendiente');
+    navigate('/gracias');
+  }, [navigate]);
+
+  // 🔹 Reiniciar flujo
+  const reset = useCallback(() => {
+    localStorage.removeItem('solicitudPendiente');
+    setForm({ ...initialFormDefault, visitorId });
+    setMensajeCancelado('');
+    setStep(0);
+  }, [visitorId]);
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* 🔹 Home público */}
-          <Route path="/" element={<IntroEstudio />} />
+    <>
+      {/* Header */}
+      <header className="bg-white shadow-sm py-3 mb-4">
+        <div className="container d-flex justify-content-between align-items-center">
+          <img src="/sax.png" alt="SAX Services" height="130" />
+          <h6 className="mb-0 text-secondary">Estudios Socioeconómicos</h6>
+        </div>
+      </header>
 
-          {/* 🔹 Autenticación */}
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login"  element={<Login />}  />
+      {/* Contenido */}
+      <div className="container mb-5">
+        {step === 0 && <IntroEstudio onStart={() => setStep(1)} />}
 
-          {/* 🔹 Wizard protegido */}
-          <Route
-            path="/wizard"
-            element={
-              <ProtectedRoute>
-                <PedirEstudio
-                  visitorId={visitorId}
-                  initialForm={initialForm}
-                  initialStep={initialStep}
-                />
-              </ProtectedRoute>
-            }
+        {step === 1 && (
+          <Paso1
+            form={form}
+            setForm={setForm}
+            onNext={() => {
+              setForm(f => ({
+                ...f,
+                nombreSolicitante: `${f.nombre.trim()} ${f.apellido.trim()}`
+              }));
+              setStep(2);
+            }}
           />
+        )}
 
-          {/* 🔹 Gracias protegido */}
-          <Route
-            path="/gracias"
-            element={
-              <ProtectedRoute>
-                <Gracias visitorId={visitorId} />
-              </ProtectedRoute>
-            }
+        {step === 2 && (
+          <Paso2
+            form={form}
+            setForm={setForm}
+            onBack={() => setStep(1)}
+            onNext={() => setStep(3)}
           />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+        )}
+
+        {step === 3 && (
+          <Paso3
+            form={form}
+            setForm={setForm}
+            onBack={() => setStep(2)}
+            onNext={() => setStep(4)}
+          />
+        )}
+
+        {step === 4 && (
+          <Paso4
+            form={form}
+            mensajeCancelado={mensajeCancelado}
+            onBack={() => setStep(3)}
+            onFinish={finish}
+            onReset={reset}
+          />
+        )}
+      </div>
+    </>
   );
 }
-
-export default App;
