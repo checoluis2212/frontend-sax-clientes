@@ -9,8 +9,7 @@ import Paso2 from '../components/Paso2';
 import Paso3 from '../components/Paso3';
 import Paso4 from '../components/Paso4';
 
-// Estado inicial del formulario
-const initialForm = {
+const initialFormDefault = {
   nombre: '',
   apellido: '',
   empresa: '',
@@ -28,13 +27,13 @@ const initialForm = {
   visitorId: ''
 };
 
-export default function PedirEstudio({ visitorId }) {
+export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
 
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ ...initialForm });
+  const [step, setStep] = useState(initialStep || 0);
+  const [form, setForm] = useState({ ...initialFormDefault, ...initialForm });
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
   // 🔹 Verificar login cuando estamos en pasos > 0
@@ -44,19 +43,13 @@ export default function PedirEstudio({ visitorId }) {
     }
   }, [step, user, navigate]);
 
-  // 🔹 Restaurar estado desde URL, localStorage o Stripe
+  // 🔹 Restaurar desde Stripe y URL
   useEffect(() => {
-    if (!visitorId) return;
-
     const params = new URLSearchParams(location.search);
 
-    // Paso forzado desde URL (?step=1)
-    const urlStep = parseInt(params.get('step'), 10);
-    if (!isNaN(urlStep)) {
-      setStep(urlStep);
-    }
+    if (!visitorId) return;
 
-    // Pago completado
+    // Pago exitoso
     if (params.get('pagado') === 'true') {
       localStorage.removeItem('solicitudPendiente');
       navigate('/gracias');
@@ -66,18 +59,9 @@ export default function PedirEstudio({ visitorId }) {
     // Guardar visitorId
     setForm(f => ({ ...f, visitorId }));
 
-    // Restaurar solicitud pendiente SOLO si no vino step en URL
-    const pendiente = localStorage.getItem('solicitudPendiente');
-    if (pendiente && isNaN(urlStep)) {
-      const data = JSON.parse(pendiente);
-
-      // Pago cancelado
-      if (params.get('cancelado') === 'true') {
-        setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
-      }
-
-      setForm(f => ({ ...f, ...data }));
-      setStep(data.pasoActual || 0);
+    // Pago cancelado
+    if (params.get('cancelado') === 'true') {
+      setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
     }
   }, [visitorId, location.search, navigate]);
 
@@ -90,7 +74,7 @@ export default function PedirEstudio({ visitorId }) {
   // 🔹 Reiniciar flujo
   const reset = useCallback(() => {
     localStorage.removeItem('solicitudPendiente');
-    setForm({ ...initialForm, visitorId });
+    setForm({ ...initialFormDefault, visitorId });
     setMensajeCancelado('');
     setStep(0);
   }, [visitorId]);
