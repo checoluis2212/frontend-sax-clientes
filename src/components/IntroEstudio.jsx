@@ -1,3 +1,4 @@
+// src/components/IntroEstudio.jsx
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
@@ -22,7 +23,7 @@ export default function IntroEstudio() {
           Estándar $500 MXN | Urgente $800 MXN
         </p>
 
-        {/* Pasos */}
+        {/* Pasos con íconos SVG */}
         <div className="row justify-content-center text-center mb-5">
           <div className="col-12 col-md-4 mb-4">
             <img src="/register.svg" alt="Registro" className="icon-step mb-3" />
@@ -47,4 +48,25 @@ export default function IntroEstudio() {
           </div>
         </div>
 
-        
+        {/* Botón de acción */}
+        {user ? (
+          <button
+            className="btn btn-primary btn-lg shadow-sm"
+            onClick={() => navigate('/wizard?step=1')}
+          >
+            Empezar ahora
+          </button>
+        ) : (
+          <div className="d-flex justify-content-center gap-2">
+            <Link to="/login" className="btn btn-primary shadow-sm">
+              Ingresar
+            </Link>
+            <Link to="/signup" className="btn btn-outline-secondary shadow-sm">
+              Crear cuenta
+            </Link>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
