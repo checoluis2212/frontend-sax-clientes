@@ -9,7 +9,7 @@ import Paso2 from '../components/Paso2';
 import Paso3 from '../components/Paso3';
 import Paso4 from '../components/Paso4';
 
-const initialFormDefault = {
+const defaultForm = {
   nombre: '',
   apellido: '',
   empresa: '',
@@ -27,61 +27,63 @@ const initialFormDefault = {
   visitorId: ''
 };
 
-export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
+export default function PedirEstudio({ visitorId, initialForm = {}, initialStep = 0 }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
 
   const [step, setStep] = useState(initialStep || 0);
-  const [form, setForm] = useState({ ...initialFormDefault, ...initialForm });
+  const [form, setForm] = useState({ ...defaultForm, ...initialForm, visitorId });
   const [mensajeCancelado, setMensajeCancelado] = useState('');
 
-  // 🔹 Verificar login cuando estamos en pasos > 0
+  // 🔒 Si no está logueado y ya está en pasos, redirigir a login
   useEffect(() => {
     if (step > 0 && !user) {
       navigate('/login');
     }
   }, [step, user, navigate]);
 
-  // 🔹 Restaurar desde Stripe y URL
+  // 🔁 Stripe y restaurar desde localStorage si no vino de App
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-
     if (!visitorId) return;
 
-    // Pago exitoso
+    const params = new URLSearchParams(location.search);
+
     if (params.get('pagado') === 'true') {
       localStorage.removeItem('solicitudPendiente');
       navigate('/gracias');
       return;
     }
 
-    // Guardar visitorId
-    setForm(f => ({ ...f, visitorId }));
-
-    // Pago cancelado
+    // Cancelado desde Stripe
     if (params.get('cancelado') === 'true') {
       setMensajeCancelado('El pago fue cancelado. Puedes reintentarlo.');
     }
-  }, [visitorId, location.search, navigate]);
 
-  // 🔹 Terminar flujo
+    // Si no vino `initialForm`, intenta cargarlo desde localStorage
+    const local = localStorage.getItem('solicitudPendiente');
+    if (local && !initialForm?.nombreCandidato) {
+      const data = JSON.parse(local);
+      setForm(f => ({ ...f, ...data }));
+      setStep(data.pasoActual || 0);
+    }
+
+  }, [visitorId, location.search, navigate, initialForm]);
+
   const finish = useCallback(() => {
     localStorage.removeItem('solicitudPendiente');
     navigate('/gracias');
   }, [navigate]);
 
-  // 🔹 Reiniciar flujo
   const reset = useCallback(() => {
     localStorage.removeItem('solicitudPendiente');
-    setForm({ ...initialFormDefault, visitorId });
+    setForm({ ...defaultForm, visitorId });
     setMensajeCancelado('');
     setStep(0);
   }, [visitorId]);
 
   return (
     <>
-      {/* Header */}
       <header className="bg-white shadow-sm py-3 mb-4">
         <div className="container d-flex justify-content-between align-items-center">
           <img src="/sax.png" alt="SAX Services" height="130" />
@@ -89,10 +91,10 @@ export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
         </div>
       </header>
 
-      {/* Contenido */}
       <div className="container mb-5">
-        {step === 0 && <IntroEstudio onStart={() => setStep(1)} />}
-
+        {step === 0 && (
+          <IntroEstudio onStart={() => setStep(1)} />
+        )}
         {step === 1 && (
           <Paso1
             form={form}
@@ -106,7 +108,6 @@ export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
             }}
           />
         )}
-
         {step === 2 && (
           <Paso2
             form={form}
@@ -115,7 +116,6 @@ export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
             onNext={() => setStep(3)}
           />
         )}
-
         {step === 3 && (
           <Paso3
             form={form}
@@ -124,7 +124,6 @@ export default function PedirEstudio({ visitorId, initialForm, initialStep }) {
             onNext={() => setStep(4)}
           />
         )}
-
         {step === 4 && (
           <Paso4
             form={form}
