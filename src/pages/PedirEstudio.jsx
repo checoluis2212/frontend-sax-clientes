@@ -66,9 +66,9 @@ export default function PedirEstudio({ visitorId }) {
     // Guardar visitorId
     setForm(f => ({ ...f, visitorId }));
 
-    // Restaurar solicitud pendiente
+    // Restaurar solicitud pendiente SOLO si no vino step en URL
     const pendiente = localStorage.getItem('solicitudPendiente');
-    if (pendiente) {
+    if (pendiente && isNaN(urlStep)) {
       const data = JSON.parse(pendiente);
 
       // Pago cancelado
@@ -107,9 +107,7 @@ export default function PedirEstudio({ visitorId }) {
 
       {/* Contenido */}
       <div className="container mb-5">
-        {step === 0 && (
-          <IntroEstudio onStart={() => setStep(1)} />
-        )}
+        {step === 0 && <IntroEstudio onStart={() => setStep(1)} />}
 
         {step === 1 && (
           <Paso1
